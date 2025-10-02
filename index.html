@@ -4,14 +4,25 @@
   <meta charset="UTF-8">
   <title>Trò chơi trắc nghiệm Vật lý</title>
   <style>
-    /* ===== GIAO DIỆN NỀN ===== */
     body {
       margin: 0;
       font-family: "Segoe UI", sans-serif;
-      background: radial-gradient(circle at center, #0b1c3a, #000);
       color: #fff;
       overflow-x: hidden;
+      background: black; /* fallback nếu video không chạy */
     }
+
+    /* ===== VIDEO NỀN ===== */
+    #bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      min-width: 100%;
+      min-height: 100%;
+      object-fit: cover;
+      z-index: -1; /* đưa xuống dưới toàn bộ nội dung */
+    }
+
     h1 {
       text-align: center;
       padding: 20px;
@@ -156,11 +167,12 @@
   </style>
 </head>
 <body>
-    <!-- Video nền -->
+  <!-- Video nền -->
   <video autoplay muted loop id="bg-video">
     <source src="assets/videos/background.mp4" type="video/mp4">
     Trình duyệt của bạn không hỗ trợ video.
   </video>
+
   <h1>🌌 Trò chơi trắc nghiệm Vật lý 🌌</h1>
 
   <div class="top-bar">
@@ -169,9 +181,7 @@
   </div>
   <div class="progress-bar"><div id="progress" class="progress"></div></div>
 
-  <div class="cards" id="cards">
-    <!-- Card sẽ được thêm bằng JS -->
-  </div>
+  <div class="cards" id="cards"></div>
 
   <!-- Modal câu hỏi -->
   <div class="modal" id="questionModal">
