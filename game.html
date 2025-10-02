@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Trò chơi trắc nghiệm Vật lý</title>
+  <style>
+    /* ===== GIAO DIỆN NỀN ===== */
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: radial-gradient(circle at center, #0b1c3a, #000);
+      color: #fff;
+      overflow-x: hidden;
+    }
+    h1 {
+      text-align: center;
+      padding: 20px;
+      color: #ffd700;
+      text-shadow: 0 0 10px #ffd700;
+    }
+
+    /* ===== THANH ĐIỂM & TIẾN TRÌNH ===== */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 30px;
+      font-size: 18px;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      background: #444;
+      border-radius: 5px;
+      margin: 15px auto;
+      overflow: hidden;
+    }
+    .progress {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #00f, #0ff);
+      transition: width 0.3s ease;
+    }
+
+    /* ===== CARD CÂU HỎI ===== */
+    .cards {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 20px;
+      gap: 15px;
+    }
+    .magic-card {
+      width: 120px;
+      height: 150px;
+      background: linear-gradient(135deg, #1a237e, #283593);
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+      font-weight: bold;
+      font-size: 16px;
+      text-align: center;
+      color: #fff;
+    }
+    .magic-card:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px #00e5ff;
+    }
+    .magic-card.answered {
+      background: #333;
+      color: #aaa;
+      pointer-events: none;
+    }
+
+    /* ===== MODAL ===== */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: #222;
+      border-radius: 15px;
+      padding: 25px;
+      max-width: 500px;
+      text-align: center;
+      box-shadow: 0 0 25px #00e5ff;
+    }
+    .modal-content h2 {
+      margin-top: 0;
+      color: #ffea00;
+    }
+    .answers {
+      margin-top: 15px;
+      display: grid;
+      gap: 10px;
+    }
+    .answers button {
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      background: #1e88e5;
+      color: #fff;
+      transition: 0.2s;
+    }
+    .answers button:hover {
+      background: #42a5f5;
+    }
+
+    /* ===== NÚT CHUNG ===== */
+    .btn {
+      margin-top: 15px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      background: #00c853;
+      color: white;
+      transition: 0.2s;
+    }
+    .btn:hover {
+      background: #00e676;
+    }
+
+    /* ===== HIỆU ỨNG ===== */
+    .confetti {
+      position: fixed;
+      width: 8px; height: 8px;
+      background: #ff0;
+      top: 0; left: 50%;
+      animation: fall 3s linear forwards;
+      border-radius: 50%;
+    }
+    @keyframes fall {
+      to {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+    .shake { animation: shake 0.5s; }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+  </style>
+</head>
+<body>
+  <h1>🌌 Trò chơi trắc nghiệm Vật lý 🌌</h1>
+
+  <div class="top-bar">
+    <div id="score">Điểm: 0/7</div>
+    <button class="btn" onclick="resetGame()">🔄 Reset</button>
+  </div>
+  <div class="progress-bar"><div id="progress" class="progress"></div></div>
+
+  <div class="cards" id="cards">
+    <!-- Card sẽ được thêm bằng JS -->
+  </div>
+
+  <!-- Modal câu hỏi -->
+  <div class="modal" id="questionModal">
+    <div class="modal-content">
+      <h2 id="questionText"></h2>
+      <div class="answers" id="answers"></div>
+      <button class="btn" onclick="closeQuestionModal()">Đóng</button>
+    </div>
+  </div>
+
+  <!-- Modal kết quả -->
+  <div class="modal" id="resultModal">
+    <div class="modal-content" id="resultContent"></div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "Lực hấp dẫn giữa hai vật tỉ lệ nghịch với?",
+        answers: ["Bình phương khoảng cách", "Khoảng cách", "Khối lượng", "Bình phương khối lượng"],
+        correct: 0
+      },
+      {
+        question: "Ai là người đầu tiên nêu ra định luật vạn vật hấp dẫn?",
+        answers: ["Einstein", "Newton", "Galileo", "Kepler"],
+        correct: 1
+      },
+      {
+        question: "Hằng số hấp dẫn G có giá trị xấp xỉ?",
+        answers: ["6.67×10^-11", "9.8", "3.0×10^8", "1.6×10^-19"],
+        correct: 0
+      },
+      {
+        question: "Trái đất hút Mặt trăng do?",
+        answers: ["Từ trường", "Trọng lực", "Lực hấp dẫn", "Lực ly tâm"],
+        correct: 2
+      },
+      {
+        question: "Gia tốc rơi tự do trên Trái đất phụ thuộc vào?",
+        answers: ["Khối lượng vật", "Độ cao so với Trái đất", "Khối lượng mặt trăng", "Nhiệt độ"],
+        correct: 1
+      },
+      {
+        question: "Quỹ đạo của các hành tinh quanh Mặt trời có dạng?",
+        answers: ["Hình tròn", "Hình ellipse", "Đường thẳng", "Hình parabol"],
+        correct: 1
+      },
+      {
+        question: "Lực hấp dẫn có đặc điểm?",
+        answers: ["Chỉ hút, không đẩy", "Chỉ đẩy", "Có thể hút hoặc đẩy", "Không tác dụng"],
+        correct: 0
+      }
+    ];
+
+    let currentQuestion = null;
+    let score = 0;
+    const answered = new Set();
+
+    // Tạo card
+    const cardContainer = document.getElementById("cards");
+    questions.forEach((q, i) => {
+      const card = document.createElement("div");
+      card.className = "magic-card";
+      card.textContent = "Câu " + (i+1);
+      card.onclick = () => openQuestion(i, card);
+      cardContainer.appendChild(card);
+    });
+
+    function openQuestion(index, card) {
+      if (answered.has(index)) return;
+      currentQuestion = index;
+      document.getElementById("questionText").textContent = questions[index].question;
+      const ansBox = document.getElementById("answers");
+      ansBox.innerHTML = "";
+      questions[index].answers.forEach((ans, i) => {
+        const btn = document.createElement("button");
+        btn.textContent = ans;
+        btn.onclick = () => selectAnswer(i, card);
+        ansBox.appendChild(btn);
+      });
+      document.getElementById("questionModal").style.display = "flex";
+    }
+
+    function closeQuestionModal() {
+      document.getElementById("questionModal").style.display = "none";
+    }
+
+    function selectAnswer(choice, card) {
+      const q = questions[currentQuestion];
+      answered.add(currentQuestion);
+      card.classList.add("answered");
+      closeQuestionModal();
+      if (choice === q.correct) {
+        score++;
+        showResult(true);
+        createConfetti();
+      } else {
+        showResult(false);
+        document.body.classList.add("shake");
+        setTimeout(()=>document.body.classList.remove("shake"),500);
+      }
+      updateScore();
+      updateProgress();
+      if (answered.size === questions.length) {
+        setTimeout(showFinalResult, 600);
+      }
+    }
+
+    function showResult(correct) {
+      const modal = document.getElementById("resultModal");
+      const box = document.getElementById("resultContent");
+      box.innerHTML = correct
+        ? "<h2>🎉 Chính xác!</h2>"
+        : "<h2>❌ Sai mất rồi!</h2>";
+      box.innerHTML += "<button class='btn' onclick='closeResultModal()'>Tiếp tục</button>";
+      modal.style.display = "flex";
+    }
+
+    function closeResultModal() {
+      document.getElementById("resultModal").style.display = "none";
+    }
+
+    function showFinalResult() {
+      const modal = document.getElementById("resultModal");
+      const box = document.getElementById("resultContent");
+      let msg = score===questions.length ? "Xuất sắc! 🌟" :
+                score>=5 ? "Rất tốt! 👍" :
+                "Cố gắng thêm nhé! 💪";
+      box.innerHTML = `<h2>Kết quả: ${score}/${questions.length}</h2><p>${msg}</p>
+      <button class="btn" onclick="resetGame()">Chơi lại</button>`;
+      modal.style.display = "flex";
+    }
+
+    function updateScore() {
+      document.getElementById("score").textContent = `Điểm: ${score}/${questions.length}`;
+    }
+
+    function updateProgress() {
+      document.getElementById("progress").style.width = (answered.size/questions.length*100)+"%";
+    }
+
+    function resetGame() {
+      score = 0;
+      answered.clear();
+      updateScore();
+      updateProgress();
+      document.querySelectorAll(".magic-card").forEach(c => c.classList.remove("answered"));
+      closeQuestionModal();
+      closeResultModal();
+    }
+
+    function createConfetti() {
+      for (let i=0;i<30;i++) {
+        const c = document.createElement("div");
+        c.className="confetti";
+        c.style.left=Math.random()*100+"%";
+        c.style.background=`hsl(${Math.random()*360},100%,50%)`;
+        c.style.animationDuration=(2+Math.random()*2)+"s";
+        document.body.appendChild(c);
+        setTimeout(()=>c.remove(),3000);
+      }
+    }
+  </script>
+</body>
+</html>
