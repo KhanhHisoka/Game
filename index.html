@@ -9,7 +9,9 @@
       font-family: "Segoe UI", sans-serif;
       color: #fff;
       overflow-x: hidden;
-      background: black;
+      /* ảnh nền */
+      background: url("assets/images/background.jpg") no-repeat center center fixed;
+      background-size: cover;
     }
 
     h1 {
@@ -26,6 +28,7 @@
       padding: 0 30px;
       font-size: 18px;
     }
+
     .progress-bar {
       width: 100%;
       height: 10px;
@@ -34,6 +37,7 @@
       margin: 15px auto;
       overflow: hidden;
     }
+
     .progress {
       width: 0%;
       height: 100%;
@@ -49,6 +53,7 @@
       gap: 20px;
       margin: 30px auto;
     }
+
     .magic-card {
       height: 120px;
       display: flex;
@@ -64,9 +69,11 @@
       background: red;
       animation: rainbow 5s linear infinite; /* Hiệu ứng đổi màu cầu vồng */
     }
+
     .magic-card:hover {
       transform: scale(1.08);
     }
+
     .magic-card.answered {
       background: #333 !important;
       color: #aaa;
@@ -78,13 +85,16 @@
     .modal {
       display: none;
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       background: rgba(0,0,0,0.7);
       z-index: 1000;
       justify-content: center;
       align-items: center;
     }
+
     .modal-content {
       background: #222;
       border-radius: 15px;
@@ -93,15 +103,18 @@
       text-align: center;
       box-shadow: 0 0 25px #00e5ff;
     }
+
     .modal-content h2 {
       margin-top: 0;
       color: #ffea00;
     }
+
     .answers {
       margin-top: 15px;
       display: grid;
       gap: 10px;
     }
+
     .answers button {
       padding: 10px;
       border: none;
@@ -112,6 +125,7 @@
       color: #fff;
       transition: 0.2s;
     }
+
     .answers button:hover {
       background: #42a5f5;
     }
@@ -128,6 +142,7 @@
       color: white;
       transition: 0.2s;
     }
+
     .btn:hover {
       background: #00e676;
     }
@@ -135,19 +150,23 @@
     /* ===== HIỆU ỨNG ===== */
     .confetti {
       position: fixed;
-      width: 8px; height: 8px;
+      width: 8px;
+      height: 8px;
       background: #ff0;
-      top: 0; left: 50%;
+      top: 0;
+      left: 50%;
       animation: fall 3s linear forwards;
       border-radius: 50%;
     }
+
     @keyframes fall {
-      to {
-        transform: translateY(100vh) rotate(720deg);
-        opacity: 0;
-      }
+      to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
     }
-    .shake { animation: shake 0.5s; }
+
+    .shake {
+      animation: shake 0.5s;
+    }
+
     @keyframes shake {
       0%,100% { transform: translateX(0); }
       25% { transform: translateX(-5px); }
@@ -156,24 +175,18 @@
 
     /* ===== HIỆU ỨNG CẦU VỒNG ===== */
     @keyframes rainbow {
-      from {
-        filter: hue-rotate(0deg);
-      }
-      to {
-        filter: hue-rotate(360deg);
-      }
+      from { filter: hue-rotate(0deg); }
+      to { filter: hue-rotate(360deg); }
     }
   </style>
 </head>
 <body>
   <h1>🌌 Trò chơi trắc nghiệm Vật lý 🌌</h1>
-
   <div class="top-bar">
     <div id="score">Điểm: 0/7</div>
     <button class="btn" onclick="resetGame()">🔄 Reset</button>
   </div>
   <div class="progress-bar"><div id="progress" class="progress"></div></div>
-
   <div class="cards" id="cards"></div>
 
   <!-- Modal câu hỏi -->
@@ -191,15 +204,15 @@
   </div>
 
   <script>
-   const questions = [ 
-     { question: "Lực Hấp dẫn tồn tại giữa:", answers: ["Trái Đất và quả táo", "Mặt Trăng và Trái Đất", "Hai học sinh trong lớp", "Tất cả trường hợp trên"], correct: 3 },
-     { question: "Trọng lực là gì?", answers: ["Lực ép của vật lên mặt đất", "Lực hút Trái Đất tác dụng lên vật", "Lực hút giữa Trái Đất và Mặt Trăng", "Lực hút của mọi vật tác dụng lên Trái Đất"], correct: 1 },
-     { question: "Nếu khối lượng một vật tăng gấp đôi thì lực hấp dẫn giữa nó và Trái Đất", answers: ["Không đổi", "Tăng 2 lần", "Giảm 2 lần", "Tăng 4 lần"], correct: 1 },
-     { question: "Nếu khoảng cách giữa hai vật tăng gấp 3, thì lực hấp dẫn:", answers: ["Giảm 3 lần", "Không giảm", "Giảm 6 lần", "Giảm 9 lần"], correct: 3 },
-     { question: "Định luật vạn vật hấp dẫn giúp ta:", answers: ["Giải thích quỹ đạo hành tinh", "Phóng vệ tinh nhân tạo", "Hiểu hiện tượng thủy triều", "Tất cả đều đúng"], correct: 3 },
-     { question: "Đại lượng nào sau đây không ảnh hưởng đến lực hấp dẫn giữa hai vật?", answers: ["Khối lượng vật thứ nhất", "Khối lượng vật thứ hai", "Khoảng cách giữa hai vật", "Vận tốc chuyển động của hai vật"], correct: 3 },
-     { question: "Một vật có khối lượng m đặt trên mặt đất chịu tác dụng lực hút của Trái Đất là F, nếu đưa vật đó lên độ cao bằng đúng bán kính R thì lực hấp dẫn sẽ bằng bao nhiêu?", answers: ["F", "1/2F", "1/3F", "1/4F"], correct: 3 } 
-   ];
+    const questions = [
+      { question: "Lực Hấp dẫn tồn tại giữa:", answers: ["Trái Đất và quả táo", "Mặt Trăng và Trái Đất", "Hai học sinh trong lớp", "Tất cả trường hợp trên"], correct: 3 },
+      { question: "Trọng lực là gì?", answers: ["Lực ép của vật lên mặt đất", "Lực hút Trái Đất tác dụng lên vật", "Lực hút giữa Trái Đất và Mặt Trăng", "Lực hút của mọi vật tác dụng lên Trái Đất"], correct: 1 },
+      { question: "Nếu khối lượng một vật tăng gấp đôi thì lực hấp dẫn giữa nó và Trái Đất", answers: ["Không đổi", "Tăng 2 lần", "Giảm 2 lần", "Tăng 4 lần"], correct: 1 },
+      { question: "Nếu khoảng cách giữa hai vật tăng gấp 3, thì lực hấp dẫn:", answers: ["Giảm 3 lần", "Không giảm", "Giảm 6 lần", "Giảm 9 lần"], correct: 3 },
+      { question: "Định luật vạn vật hấp dẫn giúp ta:", answers: ["Giải thích quỹ đạo hành tinh", "Phóng vệ tinh nhân tạo", "Hiểu hiện tượng thủy triều", "Tất cả đều đúng"], correct: 3 },
+      { question: "Đại lượng nào sau đây không ảnh hưởng đến lực hấp dẫn giữa hai vật?", answers: ["Khối lượng vật thứ nhất", "Khối lượng vật thứ hai", "Khoảng cách giữa hai vật", "Vận tốc chuyển động của hai vật"], correct: 3 },
+      { question: "Một vật có khối lượng m đặt trên mặt đất chịu tác dụng lực hút của Trái Đất là F, nếu đưa vật đó lên độ cao bằng đúng bán kính R thì lực hấp dẫn sẽ bằng bao nhiêu?", answers: ["F", "1/2F", "1/3F", "1/4F"], correct: 3 }
+    ];
 
     let currentQuestion = 0;
     let score = 0;
@@ -239,7 +252,6 @@
       answered.add(currentQuestion);
       card.classList.add("answered");
       closeQuestionModal();
-
       if (choice === q.correct) {
         score++;
         showResult(true);
@@ -252,7 +264,6 @@
       }
       updateScore();
       updateProgress();
-
       if (answered.size === questions.length) {
         setTimeout(showFinalResult, 600);
       }
@@ -261,9 +272,7 @@
     function showResult(correct) {
       const modal = document.getElementById("resultModal");
       const box = document.getElementById("resultContent");
-      let content = correct
-        ? "<h2>🎉 Chính xác!</h2>"
-        : "<h2>❌ Sai mất rồi!</h2>";
+      let content = correct ? "<h2>🎉 Chính xác!</h2>" : "<h2>❌ Sai mất rồi!</h2>";
       content += "<button class='btn' onclick='closeResultModal()'>Tiếp tục</button>";
       box.innerHTML = content;
       modal.style.display = "flex";
@@ -276,11 +285,8 @@
     function showFinalResult() {
       const modal = document.getElementById("resultModal");
       const box = document.getElementById("resultContent");
-      let msg = score===questions.length ? "Xuất sắc! 🌟" :
-                score>=5 ? "Rất tốt! 👍" :
-                "Cố gắng thêm nhé! 💪";
-      box.innerHTML = `<h2>Kết quả: ${score}/${questions.length}</h2><p>${msg}</p>
-      <button class="btn" onclick="resetGame()">Chơi lại</button>`;
+      let msg = score===questions.length ? "Xuất sắc! 🌟" : score>=5 ? "Rất tốt! 👍" : "Cố gắng thêm nhé! 💪";
+      box.innerHTML = `<h2>Kết quả: ${score}/${questions.length}</h2><p>${msg}</p> <button class="btn" onclick="resetGame()">Chơi lại</button>`;
       modal.style.display = "flex";
     }
 
