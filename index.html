@@ -1,40 +1,49 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Trò chơi trắc nghiệm Vật lý</title>
   <style>
-body {
-  margin: 0;
-  font-family: "Segoe UI", sans-serif;
-  background: url("assets/images/background.jpg") no-repeat center center fixed;
-  background-size: cover;
-  color: white;
-  text-align: center;
-}
-
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      color: #fff;
+      overflow-x: hidden;
+      text-align: center;
+      background: url("assets/images/background.jpg") no-repeat center center fixed;
+      background-size: cover;
+    }
 
     h1 {
-      margin: 20px 0;
-      font-size: 26px;
-      font-weight: bold;
-      color: #ffeb3b;
-      text-shadow: 0 0 10px #00e5ff, 0 0 20px #00e5ff;
+      text-align: center;
+      padding: 20px;
+      color: #ffd700;
+      text-shadow: 0 0 10px #ffd700;
     }
 
-    .score-board {
-      margin: 10px;
+    /* ===== THANH ĐIỂM & TIẾN TRÌNH ===== */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 30px;
       font-size: 18px;
     }
-
-    /* ===== HÌNH ẢNH ===== */
-    .banner img {
-      max-width: 200px;
-      margin: 10px auto;
-      display: block;
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      background: #444;
+      border-radius: 5px;
+      margin: 15px auto;
+      overflow: hidden;
+    }
+    .progress {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #00f, #0ff);
+      transition: width 0.3s ease;
     }
 
-    /* ===== LAYOUT 7 CÂU HỎI ===== */
+    /* ===== LAYOUT CÂU HỎI ===== */
     .cards {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -42,9 +51,8 @@ body {
       max-width: 700px;
       margin: 30px auto;
     }
-
     .magic-card {
-      background: linear-gradient(135deg, #1a237e, #283593);
+      height: 120px;
       border-radius: 12px;
       display: flex;
       justify-content: center;
@@ -55,20 +63,30 @@ body {
       font-size: 18px;
       text-align: center;
       color: #fff;
-      height: 120px;
+      background: linear-gradient(135deg, #1a237e, #283593);
+      -webkit-animation: rainbow 6s linear infinite;
+              animation: rainbow 6s linear infinite;
     }
-
-    /* rainbow hover */
     .magic-card:hover {
-      -webkit-animation: rainbow 4s linear infinite;
-      animation: rainbow 4s linear infinite;
       transform: scale(1.05);
       box-shadow: 0 0 20px #00e5ff;
     }
+    .magic-card.answered {
+      background: #333;
+      color: #aaa;
+      pointer-events: none;
+    }
+    /* Câu số 7 căn giữa dưới */
+    .magic-card:nth-child(7) {
+      grid-column: 1 / span 2;
+      justify-self: center;
+      width: 60%;
+    }
 
+    /* ===== HIỆU ỨNG RAINBOW ===== */
     @-webkit-keyframes rainbow {
-       from { -webkit-filter:hue-rotate(10deg); }
-         to { -webkit-filter:hue-rotate(360deg); }
+      from { -webkit-filter:hue-rotate(10deg); }
+      to { -webkit-filter:hue-rotate(360deg); }
     }
     @keyframes rainbow {
       from {
@@ -81,213 +99,240 @@ body {
       }
     }
 
-    .magic-card.answered {
-      background: #333;
-      color: #aaa;
-      pointer-events: none;
-      animation: none !important;
-    }
-
-    /* Câu số 7 căn giữa */
-    .magic-card:nth-child(7) {
-      grid-column: 1 / span 2;
-      justify-self: center;
-      width: 60%;
-    }
-
-    /* Modal */
+    /* ===== MODAL ===== */
     .modal {
       display: none;
       position: fixed;
-      z-index: 10;
-      left: 0; top: 0;
+      top: 0; left: 0;
       width: 100%; height: 100%;
-      overflow: auto;
-      background: rgba(0,0,0,0.8);
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
     }
-
     .modal-content {
-      background: #111;
-      margin: 10% auto;
-      padding: 20px;
-      border-radius: 10px;
-      width: 80%;
+      background: #222;
+      border-radius: 15px;
+      padding: 25px;
       max-width: 500px;
-      box-shadow: 0 0 15px #00e5ff;
+      text-align: center;
+      box-shadow: 0 0 25px #00e5ff;
     }
-
     .modal-content h2 {
-      color: #ffeb3b;
+      margin-top: 0;
+      color: #ffea00;
     }
-
+    .answers {
+      margin-top: 15px;
+      display: grid;
+      gap: 10px;
+    }
     .answers button {
-      display: block;
-      width: 100%;
-      margin: 8px 0;
-      padding: 12px;
+      padding: 10px;
       border: none;
       border-radius: 8px;
-      background: #1a237e;
-      color: #fff;
-      font-size: 16px;
       cursor: pointer;
-      transition: background 0.2s;
+      font-size: 16px;
+      background: #1e88e5;
+      color: #fff;
+      transition: 0.2s;
     }
-
     .answers button:hover {
-      background: #3949ab;
+      background: #42a5f5;
     }
 
-    .close {
-      color: #aaa;
-      float: right;
-      font-size: 24px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .close:hover {
-      color: #fff;
-    }
-
-    .reset-btn {
-      margin-top: 20px;
+    /* ===== NÚT ===== */
+    .btn {
+      margin-top: 15px;
       padding: 10px 20px;
-      background: #00c853;
+      border-radius: 8px;
       border: none;
-      border-radius: 6px;
-      color: white;
-      font-size: 16px;
       cursor: pointer;
-      transition: 0.3s;
+      font-size: 16px;
+      background: #00c853;
+      color: white;
+      transition: 0.2s;
     }
-
-    .reset-btn:hover {
+    .btn:hover {
       background: #00e676;
     }
 
-    /* Confetti canvas */
-    #confetti-canvas {
+    /* ===== CONFETTI & SHAKE ===== */
+    .confetti {
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 20;
+      width: 8px; height: 8px;
+      background: #ff0;
+      top: 0; left: 50%;
+      animation: fall 3s linear forwards;
+      border-radius: 50%;
+    }
+    @keyframes fall {
+      to {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+    .shake { animation: shake 0.5s; }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
     }
   </style>
 </head>
 <body>
-  <h1>🎇 Trò chơi trắc nghiệm Vật lý 🎇</h1>
+  <h1>🌌 Trò chơi trắc nghiệm Vật lý 🌌</h1>
 
-  <!-- Hình ảnh -->
-  <div class="banner">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Atom_icon.svg/200px-Atom_icon.svg.png" alt="Physics Logo">
+  <div class="top-bar">
+    <div id="score">Điểm: 0/7</div>
+    <button class="btn" onclick="resetGame()">🔄 Reset</button>
   </div>
+  <div class="progress-bar"><div id="progress" class="progress"></div></div>
 
-  <div class="score-board">Điểm: <span id="score">0</span>/7</div>
   <div class="cards" id="cards"></div>
-  <button class="reset-btn" onclick="resetGame()">🔄 Reset</button>
 
-  <!-- Modal -->
-  <div id="questionModal" class="modal">
+  <!-- Modal câu hỏi -->
+  <div class="modal" id="questionModal">
     <div class="modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
       <h2 id="questionText"></h2>
       <div class="answers" id="answers"></div>
+      <button class="btn" onclick="closeQuestionModal()">Đóng</button>
     </div>
   </div>
 
-  <canvas id="confetti-canvas"></canvas>
+  <!-- Modal kết quả -->
+  <div class="modal" id="resultModal">
+    <div class="modal-content" id="resultContent"></div>
+  </div>
 
   <script>
-    const questions = [
-      { q: "Công thức tính vận tốc trong dao động điều hòa?", a: ["v = ω√(A² - x²)", "v = Aωcos(ωt)", "v = Aωsin(ωt)", "v = 2π/T"], correct: 0 },
-      { q: "Chu kỳ dao động con lắc đơn phụ thuộc vào?", a: ["Biên độ", "Chiều dài dây", "Khối lượng vật", "Gia tốc g"], correct: 1 },
-      { q: "Công suất là gì?", a: ["Công trên quãng đường", "Công trên thời gian", "Lực nhân quãng đường", "Công thức khác"], correct: 1 },
-      { q: "Điện trở R mắc nối tiếp có:", a: ["Cường độ dòng điện bằng nhau", "Điện áp bằng nhau", "Điện trở bằng nhau", "Công suất bằng nhau"], correct: 0 },
-      { q: "Đơn vị của Công suất điện?", a: ["J", "V", "W", "N"], correct: 2 },
-      { q: "Tần số f có đơn vị?", a: ["Hz", "s", "m/s", "rad"], correct: 0 },
-      { q: "Trong dao động, độ lệch pha giữa vận tốc và li độ?", a: ["0", "π/2", "π", "2π"], correct: 1 }
-    ];
+   const questions = [ 
+     { question: "Lực Hấp dẫn tồn tại giữa:", answers: ["Trái Đất và quả táo", "Mặt Trăng và Trái Đất", "Hai học sinh trong lớp", "Tất cả trường hợp trên"], correct: 3 },
+     { question: "Trọng lực là gì?", answers: ["Lực ép của vật lên mặt đất", "Lực hút Trái Đất tác dụng lên vật", "Lực hút giữa Trái Đất và Mặt Trăng", "Lực hút của mọi vật tác dụng lên Trái Đất"], correct: 1 },
+     { question: "Nếu khối lượng một vật tăng gấp đôi thì lực hấp dẫn giữa nó và Trái Đất", answers: ["Không đổi", "Tăng 2 lần", "Giảm 2 lần", "Tăng 4 lần"], correct: 1 },
+     { question: "Nếu khoảng cách giữa hai vật tăng gấp 3, thì lực hấp dẫn:", answers: ["Giảm 3 lần", "Không giảm", "Giảm 6 lần", "Giảm 9 lần"], correct: 3 },
+     { question: "Định luật vạn vật hấp dẫn giúp ta:", answers: ["Giải thích quỹ đạo hành tinh", "Phóng vệ tinh nhân tạo", "Hiểu hiện tượng thủy triều", "Tất cả đều đúng"], correct: 3 },
+     { question: "Đại lượng nào sau đây không ảnh hưởng đến lực hấp dẫn giữa hai vật?", answers: ["Khối lượng vật thứ nhất", "Khối lượng vật thứ hai", "Khoảng cách giữa hai vật", "Vận tốc chuyển động của hai vật"], correct: 3 },
+     { question: "Một vật có khối lượng m đặt trên mặt đất chịu tác dụng lực hút của Trái Đất là F, nếu đưa vật đó lên độ cao bằng đúng bán kính R thì lực hấp dẫn sẽ bằng bao nhiêu?", answers: ["F", "1/2F", "1/3F", "1/4F"], correct: 3 } 
+   ];
 
-    const cardsContainer = document.getElementById("cards");
-    const modal = document.getElementById("questionModal");
-    const questionText = document.getElementById("questionText");
-    const answersDiv = document.getElementById("answers");
-    const scoreSpan = document.getElementById("score");
+    let currentQuestion = 0;
     let score = 0;
+    const answered = new Set();
 
+    // Tạo card
+    const cardContainer = document.getElementById("cards");
     questions.forEach((q, i) => {
       const card = document.createElement("div");
       card.className = "magic-card";
-      card.textContent = "Câu " + (i + 1);
-      card.onclick = () => openModal(i, card);
-      cardsContainer.appendChild(card);
+      card.textContent = "Câu " + (i+1);
+      card.onclick = () => openQuestion(i, card);
+      cardContainer.appendChild(card);
     });
 
-    function openModal(index, card) {
-      modal.style.display = "block";
-      questionText.textContent = questions[index].q;
-      answersDiv.innerHTML = "";
-      questions[index].a.forEach((ans, i) => {
+    function openQuestion(index, card) {
+      if (answered.has(index)) return;
+      currentQuestion = index;
+      document.getElementById("questionText").textContent = questions[index].question;
+      const ansBox = document.getElementById("answers");
+      ansBox.innerHTML = "";
+      questions[index].answers.forEach((ans, i) => {
         const btn = document.createElement("button");
         btn.textContent = ans;
-        btn.onclick = () => handleAnswer(index, i, card);
-        answersDiv.appendChild(btn);
+        btn.onclick = () => selectAnswer(i, card);
+        ansBox.appendChild(btn);
       });
+      document.getElementById("questionModal").style.display = "flex";
     }
 
-    function closeModal() {
-      modal.style.display = "none";
+    function closeQuestionModal() {
+      document.getElementById("questionModal").style.display = "none";
     }
 
-    function handleAnswer(qIndex, ansIndex, card) {
-      const correctIndex = questions[qIndex].correct;
-      [...answersDiv.children].forEach(b => b.disabled = true);
+    function selectAnswer(choice, card) {
+      const q = questions[currentQuestion];
+      answered.add(currentQuestion);
+      card.classList.add("answered");
+      closeQuestionModal();
 
+      // Delay 2 giây trước khi hiển thị kết quả
       setTimeout(() => {
-        if (ansIndex === correctIndex) {
+        if (choice === q.correct) {
           score++;
-          scoreSpan.textContent = score;
-          card.classList.add("answered");
-          card.textContent = "✔ Câu " + (qIndex + 1);
-          if (score === questions.length) launchConfetti();
+          showResult(true);
+          createConfetti();
+          card.style.opacity = "0.5";
         } else {
-          card.classList.add("answered");
-          card.textContent = "✘ Câu " + (qIndex + 1);
+          showResult(false);
+          document.body.classList.add("shake");
+          setTimeout(() => document.body.classList.remove("shake"), 500);
         }
-        closeModal();
+        updateScore();
+        updateProgress();
+        if (answered.size === questions.length) {
+          setTimeout(showFinalResult, 600);
+        }
       }, 2000);
+    }
+
+    function showResult(correct) {
+      const modal = document.getElementById("resultModal");
+      const box = document.getElementById("resultContent");
+      let content = correct
+        ? "<h2>🎉 Chính xác!</h2>"
+        : "<h2>❌ Sai mất rồi!</h2>";
+      content += "<button class='btn' onclick='closeResultModal()'>Tiếp tục</button>";
+      box.innerHTML = content;
+      modal.style.display = "flex";
+    }
+
+    function closeResultModal() {
+      document.getElementById("resultModal").style.display = "none";
+    }
+
+    function showFinalResult() {
+      const modal = document.getElementById("resultModal");
+      const box = document.getElementById("resultContent");
+      let msg = score===questions.length ? "Xuất sắc! 🌟" :
+                score>=5 ? "Rất tốt! 👍" :
+                "Cố gắng thêm nhé! 💪";
+      box.innerHTML = `<h2>Kết quả: ${score}/${questions.length}</h2><p>${msg}</p>
+      <button class="btn" onclick="resetGame()">Chơi lại</button>`;
+      modal.style.display = "flex";
+    }
+
+    function updateScore() {
+      document.getElementById("score").textContent = `Điểm: ${score}/${questions.length}`;
+    }
+
+    function updateProgress() {
+      document.getElementById("progress").style.width = (answered.size/questions.length*100)+"%";
     }
 
     function resetGame() {
       score = 0;
-      scoreSpan.textContent = 0;
-      cardsContainer.innerHTML = "";
-      questions.forEach((q, i) => {
-        const card = document.createElement("div");
-        card.className = "magic-card";
-        card.textContent = "Câu " + (i + 1);
-        card.onclick = () => openModal(i, card);
-        cardsContainer.appendChild(card);
+      answered.clear();
+      updateScore();
+      updateProgress();
+      document.querySelectorAll(".magic-card").forEach(c => {
+        c.classList.remove("answered");
+        c.style.opacity = "1";
       });
+      closeQuestionModal();
+      closeResultModal();
     }
 
-    function launchConfetti() {
-      const duration = 3 * 1000;
-      const end = Date.now() + duration;
-      (function frame() {
-        confetti({
-          particleCount: 5,
-          startVelocity: 30,
-          spread: 360,
-          origin: { x: Math.random(), y: Math.random() - 0.2 }
-        });
-        if (Date.now() < end) requestAnimationFrame(frame);
-      })();
+    function createConfetti() {
+      for (let i=0;i<30;i++) {
+        const c = document.createElement("div");
+        c.className="confetti";
+        c.style.left=Math.random()*100+"%";
+        c.style.background=`hsl(${Math.random()*360},100%,50%)`;
+        c.style.animationDuration=(2+Math.random()*2)+"s";
+        document.body.appendChild(c);
+        setTimeout(()=>c.remove(),3000);
+      }
     }
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 </body>
 </html>
-
