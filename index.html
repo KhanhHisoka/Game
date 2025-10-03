@@ -241,35 +241,89 @@
       document.getElementById("questionModal").style.display = "none";
     }
 
-    // ==== selectAnswer đã tích hợp delay 1 giây ====
     function selectAnswer(choice, card) {
       const q = questions[currentQuestion];
       answered.add(currentQuestion);
       card.classList.add("answered");
       closeQuestionModal();
 
-      // Delay 1 giây trước khi hiển thị modal kết quả
-      setTimeout(() => {
-        if (choice === q.correct) {
-          score++;
-          showResult(true);
-          createConfetti();
-          // Ẩn card sau khi trả lời đúng
-          card.style.opacity = "0.5";
-        } else {
-          showResult(false);
-          document.body.classList.add("shake");
-          setTimeout(() => document.body.classList.remove("shake"), 500);
-        }
-        updateScore();
-        updateProgress();
+      if (choice === q.correct) {
+        score++;
+        showResult(true);
+        createConfetti();
+        // Ẩn card sau khi trả lời đúng
+        card.style.opacity = "0.5";
+      } else {
+        showResult(false);
+        document.body.classList.add("shake");
+        setTimeout(() => document.body.classList.remove("shake"), 500);
+      }
+      updateScore();
+      updateProgress();
 
-        if (answered.size === questions.length) {
-          setTimeout(showFinalResult, 600);
-        }
-      }, 1000); // 1 giây delay
+      if (answered.size === questions.length) {
+        setTimeout(showFinalResult, 600);
+      }
     }
 
     function showResult(correct) {
       const modal = document.getElementById("resultModal");
-      const box = document.getElementById("
+      const box = document.getElementById("resultContent");
+      let content = correct
+        ? "<h2>🎉 Chính xác!</h2>"
+        : "<h2>❌ Sai mất rồi!</h2>";
+      content += "<button class='btn' onclick='closeResultModal()'>Tiếp tục</button>";
+      box.innerHTML = content;
+      modal.style.display = "flex";
+    }
+
+    function closeResultModal() {
+      document.getElementById("resultModal").style.display = "none";
+    }
+
+    function showFinalResult() {
+      const modal = document.getElementById("resultModal");
+      const box = document.getElementById("resultContent");
+      let msg = score===questions.length ? "Xuất sắc! 🌟" :
+                score>=5 ? "Rất tốt! 👍" :
+                "Cố gắng thêm nhé! 💪";
+      box.innerHTML = `<h2>Kết quả: ${score}/${questions.length}</h2><p>${msg}</p>
+      <button class="btn" onclick="resetGame()">Chơi lại</button>`;
+      modal.style.display = "flex";
+    }
+
+    function updateScore() {
+      document.getElementById("score").textContent = `Điểm: ${score}/${questions.length}`;
+    }
+
+    function updateProgress() {
+      document.getElementById("progress").style.width = (answered.size/questions.length*100)+"%";
+    }
+
+    function resetGame() {
+      score = 0;
+      answered.clear();
+      updateScore();
+      updateProgress();
+      document.querySelectorAll(".magic-card").forEach(c => {
+        c.classList.remove("answered");
+        c.style.opacity = "1"; // reset opacity
+      });
+      closeQuestionModal();
+      closeResultModal();
+    }
+
+    function createConfetti() {
+      for (let i=0;i<30;i++) {
+        const c = document.createElement("div");
+        c.className="confetti";
+        c.style.left=Math.random()*100+"%";
+        c.style.background=`hsl(${Math.random()*360},100%,50%)`;
+        c.style.animationDuration=(2+Math.random()*2)+"s";
+        document.body.appendChild(c);
+        setTimeout(()=>c.remove(),3000);
+      }
+    }
+  </script>
+</body>
+</html>
