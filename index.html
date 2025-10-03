@@ -19,7 +19,6 @@
       text-shadow: 2px 2px 4px #000;
     }
 
-    /* Lưới chứa 7 câu hỏi */
     .cards {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -55,14 +54,12 @@
       pointer-events: none;
     }
 
-    /* Câu số 7 căn giữa dưới cùng */
     .magic-card:nth-child(7) {
       grid-column: 1 / span 2;
       justify-self: center;
       width: 60%;
     }
 
-    /* Modal hiển thị câu hỏi */
     .modal {
       display: none;
       position: fixed;
@@ -115,7 +112,6 @@
       background: #5c6bc0;
     }
 
-    /* Confetti canvas */
     #confetti-canvas {
       position: fixed;
       top: 0; left: 0;
@@ -125,12 +121,10 @@
       z-index: 100;
     }
 
-    /* Modal kết thúc */
     #endModal .modal-content {
       text-align: center;
     }
 
-    /* === HIỆU ỨNG RAINBOW === */
     @-webkit-keyframes rainbow {
        from { -webkit-filter:hue-rotate(10deg); }
        to   { -webkit-filter:hue-rotate(360deg); }
@@ -153,7 +147,6 @@
 
   <div class="cards" id="cards"></div>
 
-  <!-- Modal câu hỏi -->
   <div id="questionModal" class="modal">
     <div class="modal-content">
       <span class="close">&times;</span>
@@ -163,7 +156,6 @@
     </div>
   </div>
 
-  <!-- Modal kết thúc -->
   <div id="endModal" class="modal">
     <div class="modal-content">
       <h2>🎉 Chúc mừng bạn đã hoàn thành trò chơi! 🎉</h2>
@@ -177,39 +169,39 @@
   <script>
     const questions = [
       {
-        question: "Chu kỳ của dao động điều hòa được xác định bởi đại lượng nào?",
-        answers: ["Biên độ", "Tần số", "Tần số góc", "Độ lệch pha"],
-        correct: 1
-      },
-      {
-        question: "Đại lượng nào sau đây không thay đổi trong dao động điều hòa?",
-        answers: ["Li độ", "Vận tốc", "Gia tốc", "Chu kỳ"],
+        question: "Lực Hấp dẫn tồn tại giữa:",
+        answers: ["Trái Đất và quả táo", "Mặt Trăng và Trái Đất", "Hai học sinh trong lớp", "Tất cả trường hợp trên"],
         correct: 3
       },
       {
-        question: "Công thức tính vận tốc cực đại của vật dao động điều hòa?",
-        answers: ["vmax = Aω", "vmax = A/T", "vmax = 2πA", "vmax = A/f"],
-        correct: 0
-      },
-      {
-        question: "Pha ban đầu của dao động cho biết điều gì?",
-        answers: ["Vị trí ban đầu", "Tốc độ ban đầu", "Chu kỳ", "Cả A và B"],
-        correct: 3
-      },
-      {
-        question: "Trong dao động điều hòa, li độ và vận tốc lệch pha bao nhiêu?",
-        answers: ["0", "π/2", "π", "2π"],
+        question: "Trọng lực là gì?",
+        answers: ["Lực ép của vật lên mặt đất", "Lực hút Trái Đất tác dụng lên vật", "Lực hút giữa Trái Đất và Mặt Trăng", "Lực hút của mọi vật tác dụng lên Trái Đất"],
         correct: 1
       },
       {
-        question: "Động năng cực đại của dao động điều hòa phụ thuộc vào?",
-        answers: ["Biên độ", "Tần số góc", "Khối lượng", "Cả 3"],
+        question: "Nếu khối lượng một vật tăng gấp đôi thì lực hấp dẫn giữa nó và Trái Đất",
+        answers: ["Không đổi", "Tăng 2 lần", "Giảm 2 lần", "Tăng 4 lần"],
+        correct: 1
+      },
+      {
+        question: "Nếu khoảng cách giữa hai vật tăng gấp 3, thì lực hấp dẫn:",
+        answers: ["Giảm 3 lần", "Không giảm", "Giảm 6 lần", "Giảm 9 lần"],
         correct: 3
       },
       {
-        question: "Trong dao động điều hòa, gia tốc luôn:",
-        answers: ["Cùng pha với li độ", "Ngược pha với li độ", "Cùng pha với vận tốc", "Vuông pha với li độ"],
-        correct: 1
+        question: "Định luật vạn vật hấp dẫn giúp ta:",
+        answers: ["Giải thích quỹ đạo hành tinh", "Phóng vệ tinh nhân tạo", "Hiểu hiện tượng thủy triều", "Tất cả đều đúng"],
+        correct: 3
+      },
+      {
+        question: "Đại lượng nào sau đây không ảnh hưởng đến lực hấp dẫn giữa hai vật?",
+        answers: ["Khối lượng vật thứ nhất", "Khối lượng vật thứ hai", "Khoảng cách giữa hai vật", "Vận tốc chuyển động của hai vật"],
+        correct: 3
+      },
+      {
+        question: "Một vật có khối lượng m đặt trên mặt đất chịu tác dụng lực hút của Trái Đất là F, nếu đưa vật đó lên độ cao bằng đúng bán kính R thì lực hấp dẫn sẽ bằng bao nhiêu?",
+        answers: ["F", "1/2F", "1/3F", "1/4F"],
+        correct: 3
       }
     ];
 
@@ -226,7 +218,7 @@
     let score = 0;
     let answeredCount = 0;
 
-    // Tạo 7 card
+    // Tạo card cho mỗi câu hỏi
     questions.forEach((q, index) => {
       const card = document.createElement("div");
       card.className = "magic-card";
@@ -245,34 +237,33 @@
       questions[index].answers.forEach((ans, i) => {
         const btn = document.createElement("button");
         btn.innerText = ans;
-        btn.onclick = () => handleAnswer(i, index, cardElement);
+        btn.onclick = () => handleAnswer(i, index, cardElement, btn);
         answersContainer.appendChild(btn);
       });
     }
 
-    function handleAnswer(selected, qIndex, cardElement) {
+    function handleAnswer(selected, qIndex, cardElement, btn) {
       const correct = questions[qIndex].correct;
-      feedback.innerText = "Đang kiểm tra...";
-      
-      // Delay 2 giây trước khi báo kết quả
-      setTimeout(() => {
-        if (selected === correct) {
-          feedback.innerText = "✅ Chính xác!";
-          score++;
-          launchConfetti();
-        } else {
-          feedback.innerText = "❌ Sai rồi!";
-        }
-        answeredCount++;
-        cardElement.classList.add("answered");
 
-        setTimeout(() => {
-          questionModal.style.display = "none";
-          if (answeredCount === questions.length) {
-            showEndModal();
-          }
-        }, 1500);
-      }, 2000);
+      // Tô màu ngay khi chọn
+      Array.from(answersContainer.children).forEach((b, i) => {
+        b.disabled = true;
+        if (i === correct) b.style.backgroundColor = "green";
+        else if (i === selected) b.style.backgroundColor = "red";
+        b.style.color = "white";
+      });
+
+      if (selected === correct) score++;
+
+      answeredCount++;
+      cardElement.classList.add("answered");
+
+      setTimeout(() => {
+        questionModal.style.display = "none";
+        if (answeredCount === questions.length) {
+          showEndModal();
+        }
+      }, 1500);
     }
 
     closeBtn.onclick = () => {
@@ -288,18 +279,6 @@
     function showEndModal() {
       finalScore.innerText = `Bạn trả lời đúng ${score}/${questions.length} câu!`;
       endModal.style.display = "block";
-    }
-
-    // Confetti
-    function launchConfetti() {
-      const duration = 2 * 1000;
-      const end = Date.now() + duration;
-
-      (function frame() {
-        const timeLeft = end - Date.now();
-        if (timeLeft <= 0) return;
-        requestAnimationFrame(frame);
-      })();
     }
   </script>
 </body>
