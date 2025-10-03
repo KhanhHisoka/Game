@@ -25,6 +25,13 @@
       font-size: 18px;
     }
 
+    /* ===== HÌNH ẢNH ===== */
+    .banner img {
+      max-width: 200px;
+      margin: 10px auto;
+      display: block;
+    }
+
     /* ===== LAYOUT 7 CÂU HỎI ===== */
     .cards {
       display: grid;
@@ -47,19 +54,36 @@
       text-align: center;
       color: #fff;
       height: 120px;
-      -webkit-animation: rainbow 6s linear infinite;
-      animation: rainbow 6s linear infinite;
     }
 
+    /* rainbow hover */
     .magic-card:hover {
+      -webkit-animation: rainbow 4s linear infinite;
+      animation: rainbow 4s linear infinite;
       transform: scale(1.05);
       box-shadow: 0 0 20px #00e5ff;
+    }
+
+    @-webkit-keyframes rainbow {
+       from { -webkit-filter:hue-rotate(10deg); }
+         to { -webkit-filter:hue-rotate(360deg); }
+    }
+    @keyframes rainbow {
+      from {
+        -webkit-filter:hue-rotate(10deg);
+                filter:hue-rotate(10deg);
+      }
+      to {
+        -webkit-filter:hue-rotate(360deg);
+                filter:hue-rotate(360deg);
+      }
     }
 
     .magic-card.answered {
       background: #333;
       color: #aaa;
       pointer-events: none;
+      animation: none !important;
     }
 
     /* Câu số 7 căn giữa */
@@ -152,6 +176,12 @@
 </head>
 <body>
   <h1>🎇 Trò chơi trắc nghiệm Vật lý 🎇</h1>
+
+  <!-- Hình ảnh -->
+  <div class="banner">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Atom_icon.svg/200px-Atom_icon.svg.png" alt="Physics Logo">
+  </div>
+
   <div class="score-board">Điểm: <span id="score">0</span>/7</div>
   <div class="cards" id="cards"></div>
   <button class="reset-btn" onclick="resetGame()">🔄 Reset</button>
@@ -169,41 +199,13 @@
 
   <script>
     const questions = [
-      {
-        q: "Công thức tính vận tốc trong dao động điều hòa?",
-        a: ["v = ω√(A² - x²)", "v = Aωcos(ωt)", "v = Aωsin(ωt)", "v = 2π/T"],
-        correct: 0
-      },
-      {
-        q: "Chu kỳ dao động con lắc đơn phụ thuộc vào?",
-        a: ["Biên độ", "Chiều dài dây", "Khối lượng vật", "Gia tốc g"],
-        correct: 1
-      },
-      {
-        q: "Công suất là gì?",
-        a: ["Công trên quãng đường", "Công trên thời gian", "Lực nhân quãng đường", "Công thức khác"],
-        correct: 1
-      },
-      {
-        q: "Điện trở R mắc nối tiếp có:",
-        a: ["Cường độ dòng điện bằng nhau", "Điện áp bằng nhau", "Điện trở bằng nhau", "Công suất bằng nhau"],
-        correct: 0
-      },
-      {
-        q: "Đơn vị của Công suất điện?",
-        a: ["J", "V", "W", "N"],
-        correct: 2
-      },
-      {
-        q: "Tần số f có đơn vị?",
-        a: ["Hz", "s", "m/s", "rad"],
-        correct: 0
-      },
-      {
-        q: "Trong dao động, độ lệch pha giữa vận tốc và li độ?",
-        a: ["0", "π/2", "π", "2π"],
-        correct: 1
-      }
+      { q: "Công thức tính vận tốc trong dao động điều hòa?", a: ["v = ω√(A² - x²)", "v = Aωcos(ωt)", "v = Aωsin(ωt)", "v = 2π/T"], correct: 0 },
+      { q: "Chu kỳ dao động con lắc đơn phụ thuộc vào?", a: ["Biên độ", "Chiều dài dây", "Khối lượng vật", "Gia tốc g"], correct: 1 },
+      { q: "Công suất là gì?", a: ["Công trên quãng đường", "Công trên thời gian", "Lực nhân quãng đường", "Công thức khác"], correct: 1 },
+      { q: "Điện trở R mắc nối tiếp có:", a: ["Cường độ dòng điện bằng nhau", "Điện áp bằng nhau", "Điện trở bằng nhau", "Công suất bằng nhau"], correct: 0 },
+      { q: "Đơn vị của Công suất điện?", a: ["J", "V", "W", "N"], correct: 2 },
+      { q: "Tần số f có đơn vị?", a: ["Hz", "s", "m/s", "rad"], correct: 0 },
+      { q: "Trong dao động, độ lệch pha giữa vận tốc và li độ?", a: ["0", "π/2", "π", "2π"], correct: 1 }
     ];
 
     const cardsContainer = document.getElementById("cards");
@@ -213,7 +215,6 @@
     const scoreSpan = document.getElementById("score");
     let score = 0;
 
-    // render cards
     questions.forEach((q, i) => {
       const card = document.createElement("div");
       card.className = "magic-card";
@@ -270,7 +271,6 @@
       });
     }
 
-    // Confetti
     function launchConfetti() {
       const duration = 3 * 1000;
       const end = Date.now() + duration;
@@ -284,19 +284,7 @@
         if (Date.now() < end) requestAnimationFrame(frame);
       })();
     }
-
-    // confetti lib
-    (function() {
-      var confetti = window.confetti = function(opts) {
-        const canvas = document.getElementById("confetti-canvas");
-        const ctx = canvas.getContext("2d");
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-      }
-    })();
   </script>
-  <!-- Bạn có thể thêm thư viện confetti.js từ CDN để chạy confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 </body>
 </html>
