@@ -7,188 +7,299 @@
     body {
       margin: 0;
       font-family: "Segoe UI", sans-serif;
-      background: url("assets/images/bg.jpg") no-repeat center center fixed;
+      background: url("assets/images/background.jpg") no-repeat center center fixed;
       background-size: cover;
-      color: #fff;
+      color: white;
       text-align: center;
     }
 
     h1 {
       margin-top: 20px;
-      font-size: 2.5em;
-      text-shadow: 2px 2px 5px black;
+      font-size: 32px;
+      text-shadow: 2px 2px 4px #000;
     }
 
-    .question {
-      margin: 20px auto;
-      padding: 20px;
+    /* Lưới chứa 7 câu hỏi */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-gap: 20px;
+      max-width: 700px;
+      margin: 30px auto;
+    }
+
+    .magic-card {
+      background: linear-gradient(135deg, #1a237e, #283593);
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+      font-weight: bold;
+      font-size: 18px;
+      text-align: center;
+      color: #fff;
+      height: 120px;
+      animation: rainbow 6s linear infinite;
+    }
+
+    .magic-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #00e5ff;
+    }
+
+    .magic-card.answered {
+      background: #333;
+      color: #aaa;
+      pointer-events: none;
+    }
+
+    /* Câu số 7 căn giữa dưới cùng */
+    .magic-card:nth-child(7) {
+      grid-column: 1 / span 2;
+      justify-self: center;
       width: 60%;
-      background: rgba(0, 0, 0, 0.6);
-      border-radius: 15px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.5);
     }
 
-    .btn {
-      display: inline-block;
-      margin: 8px;
-      padding: 12px 20px;
+    /* Modal hiển thị câu hỏi */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10;
+      padding-top: 100px;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.8);
+    }
+
+    .modal-content {
+      background-color: #222;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 600px;
       border-radius: 10px;
+      color: #fff;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover {
+      color: #fff;
+    }
+
+    .answers button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
       border: none;
+      border-radius: 6px;
+      background: #3949ab;
+      color: white;
       font-size: 16px;
       cursor: pointer;
-      transition: 0.3s;
+      transition: background 0.3s;
     }
 
-    .btn:hover {
-      transform: scale(1.1);
+    .answers button:hover {
+      background: #5c6bc0;
     }
 
-    .correct {
-      background: #28a745;
-      color: white;
-    }
-    .wrong {
-      background: #dc3545;
-      color: white;
-    }
-
-    /* Nút nhạc */
-    .music-btn {
+    /* Confetti canvas */
+    #confetti-canvas {
       position: fixed;
-      top: 10px;
-      right: 10px;
-      background: #ffc107;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 20px;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 100;
     }
 
-    /* Hiệu ứng rainbow */
-    .rainbow:hover {
-      -webkit-animation: rainbow 4s steps(36) infinite;
-              animation: rainbow 4s steps(36) infinite;
+    /* Modal kết thúc */
+    #endModal .modal-content {
+      text-align: center;
     }
 
+    /* === HIỆU ỨNG RAINBOW === */
     @-webkit-keyframes rainbow {
-      from { -webkit-filter:hue-rotate(10deg); }
-      to   { -webkit-filter:hue-rotate(360deg); }
+       from { -webkit-filter:hue-rotate(10deg); }
+       to   { -webkit-filter:hue-rotate(360deg); }
     }
 
     @keyframes rainbow {
       from {
-        -webkit-filter:hue-rotate(10deg);
-                filter:hue-rotate(10deg);
+        -webkit-filter: hue-rotate(10deg);
+                filter: hue-rotate(10deg);
       }
       to {
-        -webkit-filter:hue-rotate(360deg);
-                filter:hue-rotate(360deg);
+        -webkit-filter: hue-rotate(360deg);
+                filter: hue-rotate(360deg);
       }
     }
-
   </style>
 </head>
 <body>
-  <h1>🎮 Trò chơi Trắc nghiệm Vật lý 🎮</h1>
+  <h1>Trò chơi trắc nghiệm Vật lý</h1>
 
-  <!-- Logo/ảnh có rainbow -->
-  <img src="assets/images/logo.png" alt="Logo" width="120" class="rainbow">
+  <div class="cards" id="cards"></div>
 
-  <!-- Nút nhạc -->
-  <button class="music-btn" onclick="toggleMusic()">🎵</button>
-
-  <!-- Nhạc nền -->
-  <audio id="bg-music" autoplay loop>
-    <source src="assets/sounds/bg-music.mp3" type="audio/mpeg">
-  </audio>
-
-  <!-- Âm thanh đúng/sai -->
-  <audio id="correct-sound" src="assets/sounds/correct.mp3"></audio>
-  <audio id="wrong-sound" src="assets/sounds/wrong.mp3"></audio>
-
- <div id="quiz">
-
-  <div class="question">
-    <p>Câu 1: Lực Hấp dẫn tồn tại giữa:</p>
-    <button class="btn wrong" onclick="checkAnswer(this, false)">Trái Đất và quả táo</button>
-    <button class="btn wrong" onclick="checkAnswer(this, false)">Mặt Trăng và Trái Đất</button>
-    <button class="btn wrong" onclick="checkAnswer(this, false)">Hai học sinh trong lớp</button>
-    <button class="btn correct" onclick="checkAnswer(this, true)">Tất cả trường hợp trên</button>
+  <!-- Modal câu hỏi -->
+  <div id="questionModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="questionText"></h2>
+      <div class="answers" id="answers"></div>
+      <p id="feedback"></p>
+    </div>
   </div>
 
-  <div class="question">
-    <p>Câu 2: Trọng lực là gì?</p>
-    <button class="btn wrong" onclick="checkAnswer(this, false)">Lực ép của vật lên mặt đất</button>
-    <button class="btn correct" onclick="checkAnswer(this, true)">Lực hút Trái Đất tác dụng lên vật</button>
-    <button class="btn wrong" onclick="checkAnswer(this, false)">Lực hút giữa Trái Đất và Mặt Trăng</button>
-    <button class="btn wrong" onclick="checkAnswer(this, false)">Lực hút của mọi vật tác dụng lên Trái Đất</button>
+  <!-- Modal kết thúc -->
+  <div id="endModal" class="modal">
+    <div class="modal-content">
+      <h2>🎉 Chúc mừng bạn đã hoàn thành trò chơi! 🎉</h2>
+      <p id="finalScore"></p>
+      <button onclick="location.reload()">Chơi lại</button>
+    </div>
   </div>
 
-  <div class="question">
-    <p>Câu 3: Nếu khối lượng một vật tăng gấp đôi thì lực hấp dẫn giữa nó và Trái Đất</p>
-    <button class="btn wrong" onclick="checkAnswer(this, false)">Không đổi</button>
-    <button class="btn correct" onclick="checkAnswer(this, true)">Tăng 2 lần</button>
-    <button class="btn wrong" onclick="checkAnswer(this, false)">Giảm 2 lần</button>
-    <button class="btn wrong" onclick="checkAnswer(this, false)">Tăng 4 lần</button>
-  </div>
-
-  <div class="question">
-    <p>Câu 4: Nếu khoảng cách giữa hai vật tăng gấp 3, thì lực hấp dẫn:</p>
-    <button class="btn wrong" onclick="checkAnswer(this, false)">Giảm 3 lần</button>
-    <button class="btn wrong" onclick="checkAnswer(this, false)">Không giảm</button>
-    <button class="btn wrong" onclick="checkAnswer(this, false)">Giảm 6 lần</button>
-    <button class="btn correct" onclick="checkAnswer(this, true)">Giảm 9 lần</button>
-  </div>
-
-  <div class="question">
-    <p>Câu 5: Định luật vạn vật hấp dẫn giúp ta:</p>
-    <button class="btn wrong" onclick="checkAnswer(this, false)">Giải thích quỹ đạo hành tinh</button>
-    <button class="btn wrong" onclick="checkAnswer(this, false)">Phóng vệ tinh nhân tạo</button>
-    <button class="btn wrong" onclick="checkAnswer(this, false)">Hiểu hiện tượng thủy triều</button>
-    <button class="btn correct" onclick="checkAnswer(this, true)">Tất cả đều đúng</button>
-  </div>
-
-  <div class="question">
-    <p>Câu 6: Đại lượng nào sau đây không ảnh hưởng đến lực hấp dẫn giữa hai vật?</p>
-    <button class="btn wrong" onclick="checkAnswer(this, false)">Khối lượng vật thứ nhất</button>
-    <button class="btn wrong" onclick="checkAnswer(this, false)">Khối lượng vật thứ hai</button>
-    <button class="btn wrong" onclick="checkAnswer(this, false)">Khoảng cách giữa hai vật</button>
-    <button class="btn correct" onclick="checkAnswer(this, true)">Vận tốc chuyển động của hai vật</button>
-  </div>
-
-  <div class="question">
-    <p>Câu 7: Một vật có khối lượng m đặt trên mặt đất chịu tác dụng lực hút của Trái Đất là F, nếu đưa vật đó lên độ cao bằng đúng bán kính R thì lực hấp dẫn sẽ bằng bao nhiêu?</p>
-    <button class="btn wrong" onclick="checkAnswer(this, false)">F</button>
-    <button class="btn wrong" onclick="checkAnswer(this, false)">1/2F</button>
-    <button class="btn wrong" onclick="checkAnswer(this, false)">1/3F</button>
-    <button class="btn correct" onclick="checkAnswer(this, true)">1/4F</button>
-  </div>
-
-</div>
-
+  <canvas id="confetti-canvas"></canvas>
 
   <script>
-    const correctSound = document.getElementById("correct-sound");
-    const wrongSound = document.getElementById("wrong-sound");
-    const bgMusic = document.getElementById("bg-music");
-
-    function checkAnswer(button, isCorrect) {
-      if (isCorrect) {
-        correctSound.play();
-        button.style.background = "#28a745";
-      } else {
-        wrongSound.play();
-        button.style.background = "#dc3545";
+    const questions = [
+      {
+        question: "Chu kỳ của dao động điều hòa được xác định bởi đại lượng nào?",
+        answers: ["Biên độ", "Tần số", "Tần số góc", "Độ lệch pha"],
+        correct: 1
+      },
+      {
+        question: "Đại lượng nào sau đây không thay đổi trong dao động điều hòa?",
+        answers: ["Li độ", "Vận tốc", "Gia tốc", "Chu kỳ"],
+        correct: 3
+      },
+      {
+        question: "Công thức tính vận tốc cực đại của vật dao động điều hòa?",
+        answers: ["vmax = Aω", "vmax = A/T", "vmax = 2πA", "vmax = A/f"],
+        correct: 0
+      },
+      {
+        question: "Pha ban đầu của dao động cho biết điều gì?",
+        answers: ["Vị trí ban đầu", "Tốc độ ban đầu", "Chu kỳ", "Cả A và B"],
+        correct: 3
+      },
+      {
+        question: "Trong dao động điều hòa, li độ và vận tốc lệch pha bao nhiêu?",
+        answers: ["0", "π/2", "π", "2π"],
+        correct: 1
+      },
+      {
+        question: "Động năng cực đại của dao động điều hòa phụ thuộc vào?",
+        answers: ["Biên độ", "Tần số góc", "Khối lượng", "Cả 3"],
+        correct: 3
+      },
+      {
+        question: "Trong dao động điều hòa, gia tốc luôn:",
+        answers: ["Cùng pha với li độ", "Ngược pha với li độ", "Cùng pha với vận tốc", "Vuông pha với li độ"],
+        correct: 1
       }
+    ];
+
+    const cardsContainer = document.getElementById("cards");
+    const questionModal = document.getElementById("questionModal");
+    const endModal = document.getElementById("endModal");
+    const questionText = document.getElementById("questionText");
+    const answersContainer = document.getElementById("answers");
+    const feedback = document.getElementById("feedback");
+    const finalScore = document.getElementById("finalScore");
+    const closeBtn = document.getElementsByClassName("close")[0];
+
+    let currentQuestionIndex = -1;
+    let score = 0;
+    let answeredCount = 0;
+
+    // Tạo 7 card
+    questions.forEach((q, index) => {
+      const card = document.createElement("div");
+      card.className = "magic-card";
+      card.innerText = "Câu hỏi " + (index + 1);
+      card.onclick = () => openQuestion(index, card);
+      cardsContainer.appendChild(card);
+    });
+
+    function openQuestion(index, cardElement) {
+      currentQuestionIndex = index;
+      questionText.innerText = questions[index].question;
+      answersContainer.innerHTML = "";
+      feedback.innerText = "";
+      questionModal.style.display = "block";
+
+      questions[index].answers.forEach((ans, i) => {
+        const btn = document.createElement("button");
+        btn.innerText = ans;
+        btn.onclick = () => handleAnswer(i, index, cardElement);
+        answersContainer.appendChild(btn);
+      });
     }
 
-    function toggleMusic() {
-      if (bgMusic.paused) {
-        bgMusic.play();
-      } else {
-        bgMusic.pause();
+    function handleAnswer(selected, qIndex, cardElement) {
+      const correct = questions[qIndex].correct;
+      feedback.innerText = "Đang kiểm tra...";
+      
+      // Delay 2 giây trước khi báo kết quả
+      setTimeout(() => {
+        if (selected === correct) {
+          feedback.innerText = "✅ Chính xác!";
+          score++;
+          launchConfetti();
+        } else {
+          feedback.innerText = "❌ Sai rồi!";
+        }
+        answeredCount++;
+        cardElement.classList.add("answered");
+
+        setTimeout(() => {
+          questionModal.style.display = "none";
+          if (answeredCount === questions.length) {
+            showEndModal();
+          }
+        }, 1500);
+      }, 2000);
+    }
+
+    closeBtn.onclick = () => {
+      questionModal.style.display = "none";
+    };
+
+    window.onclick = (event) => {
+      if (event.target == questionModal) {
+        questionModal.style.display = "none";
       }
+    };
+
+    function showEndModal() {
+      finalScore.innerText = `Bạn trả lời đúng ${score}/${questions.length} câu!`;
+      endModal.style.display = "block";
+    }
+
+    // Confetti
+    function launchConfetti() {
+      const duration = 2 * 1000;
+      const end = Date.now() + duration;
+
+      (function frame() {
+        const timeLeft = end - Date.now();
+        if (timeLeft <= 0) return;
+        requestAnimationFrame(frame);
+      })();
     }
   </script>
 </body>
