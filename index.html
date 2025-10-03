@@ -9,28 +9,22 @@
       font-family: "Segoe UI", sans-serif;
       color: #fff;
       overflow-x: hidden;
-      background: black; /* fallback nếu video không chạy */
+      background: black;
     }
-
-    /* ===== VIDEO NỀN ===== */
     #bg-video {
       position: fixed;
-      top: 0;
-      left: 0;
+      top: 0; left: 0;
       min-width: 100%;
       min-height: 100%;
       object-fit: cover;
-      z-index: -1; /* đưa xuống dưới toàn bộ nội dung */
+      z-index: -1;
     }
-
     h1 {
       text-align: center;
       padding: 20px;
       color: #ffd700;
       text-shadow: 0 0 10px #ffd700;
     }
-
-    /* ===== THANH ĐIỂM & TIẾN TRÌNH ===== */
     .top-bar {
       display: flex;
       justify-content: space-between;
@@ -51,8 +45,6 @@
       background: linear-gradient(90deg, #00f, #0ff);
       transition: width 0.3s ease;
     }
-
-    /* ===== CARD CÂU HỎI ===== */
     .cards {
       display: flex;
       flex-wrap: wrap;
@@ -84,8 +76,6 @@
       color: #aaa;
       pointer-events: none;
     }
-
-    /* ===== MODAL ===== */
     .modal {
       display: none;
       position: fixed;
@@ -104,70 +94,40 @@
       text-align: center;
       box-shadow: 0 0 25px #00e5ff;
     }
-    .modal-content h2 {
-      margin-top: 0;
-      color: #ffea00;
-    }
-    .answers {
-      margin-top: 15px;
-      display: grid;
-      gap: 10px;
-    }
+    .modal-content h2 { margin-top:0; color:#ffea00; }
+    .answers { margin-top:15px; display:grid; gap:10px; }
     .answers button {
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      background: #1e88e5;
-      color: #fff;
+      padding: 10px; border: none; border-radius: 8px;
+      cursor: pointer; font-size: 16px;
+      background: #1e88e5; color:#fff;
       transition: 0.2s;
     }
-    .answers button:hover {
-      background: #42a5f5;
-    }
-
-    /* ===== NÚT CHUNG ===== */
+    .answers button:hover { background: #42a5f5; }
     .btn {
-      margin-top: 15px;
-      padding: 10px 20px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      font-size: 16px;
-      background: #00c853;
-      color: white;
-      transition: 0.2s;
+      margin-top: 15px; padding: 10px 20px;
+      border-radius: 8px; border: none;
+      cursor: pointer; font-size: 16px;
+      background: #00c853; color: white; transition: 0.2s;
     }
-    .btn:hover {
-      background: #00e676;
-    }
-
-    /* ===== HIỆU ỨNG ===== */
+    .btn:hover { background: #00e676; }
     .confetti {
-      position: fixed;
-      width: 8px; height: 8px;
-      background: #ff0;
-      top: 0; left: 50%;
+      position: fixed; width:8px; height:8px;
+      top:0; left:50%;
+      border-radius:50%;
       animation: fall 3s linear forwards;
-      border-radius: 50%;
     }
     @keyframes fall {
-      to {
-        transform: translateY(100vh) rotate(720deg);
-        opacity: 0;
-      }
+      to { transform: translateY(100vh) rotate(720deg); opacity:0; }
     }
     .shake { animation: shake 0.5s; }
     @keyframes shake {
-      0%,100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
+      0%,100%{transform:translateX(0);}
+      25%{transform:translateX(-5px);}
+      75%{transform:translateX(5px);}
     }
   </style>
 </head>
 <body>
-  <!-- Video nền -->
   <video autoplay muted loop id="bg-video">
     <source src="assets/videos/background.mp4" type="video/mp4">
     Trình duyệt của bạn không hỗ trợ video.
@@ -180,10 +140,8 @@
     <button class="btn" onclick="resetGame()">🔄 Reset</button>
   </div>
   <div class="progress-bar"><div id="progress" class="progress"></div></div>
-
   <div class="cards" id="cards"></div>
 
-  <!-- Modal câu hỏi -->
   <div class="modal" id="questionModal">
     <div class="modal-content">
       <h2 id="questionText"></h2>
@@ -192,130 +150,112 @@
     </div>
   </div>
 
-  <!-- Modal kết quả -->
   <div class="modal" id="resultModal">
     <div class="modal-content" id="resultContent"></div>
   </div>
 
   <script>
-   const questions = [ 
-     { question: "Lực Hấp dẫn tồn tại giữa:", answers: ["Trái Đất và quả táo", "Mặt Trăng và Trái Đất", "Hai học sinh trong lớp", "Tất cả trường hợp trên"], correct: 3 },
-     { question: "Trọng lực là gì?", answers: ["Lực ép của vật lên mặt đất", "Lực hút Trái Đất tác dụng lên vật", "Lực hút giữa Trái Đất và Mặt Trăng", "Lực hút của mọi vật tác dụng lên Trái Đất"], correct: 1 },
-     { question: "Nếu khối lượng một vật tăng gấp đôi thì lực hấp dẫn giữa nó và Trái Đất", answers: ["Không đổi", "Tăng 2 lần", "Giảm 2 lần", "Tăng 4 lần"], correct: 1 },
-     { question: "Nếu khoảng cách giữa hai vật tăng gấp 3, thì lực hấp dẫn:", answers: ["Giảm 3 lần", "Không giảm", "Giảm 6 lần", "Giảm 9 lần"], correct: 3 },
-     { question: "Định luật vạn vật hấp dẫn giúp ta:", answers: ["Giải thích quỹ đạo hành tinh", "Phóng vệ tinh nhân tạo", "Hiểu hiện tượng thủy triều", "Tất cả đều đúng"], correct: 3 },
-     { question: "Đại lượng nào sau đây không ảnh hưởng đến lực hấp dẫn giữa hai vật?", answers: ["Khối lượng vật thứ nhất", "Khối lượng vật thứ hai", "Khoảng cách giữa hai vật", "Vận tốc chuyển động của hai vật"], correct: 3 },
-     { question: "Một vật có khối lượng m đặt trên mặt đất chịu tác dụng lực hút của Trái Đất là F, nếu đưa vật đó lên độ cao bằng đúng bán kính R thì lực hấp dẫn sẽ bằng bao nhiêu?", answers: ["F", "1/2F", "1/3F", "1/4F"], correct: 3 } 
-   ];
+    const questions = [
+      {question:"Lực Hấp dẫn tồn tại giữa:",answers:["Trái Đất và quả táo","Mặt Trăng và Trái Đất","Hai học sinh trong lớp","Tất cả trường hợp trên"],correct:3},
+      {question:"Trọng lực là gì?",answers:["Lực ép của vật lên mặt đất","Lực hút Trái Đất tác dụng lên vật","Lực hút giữa Trái Đất và Mặt Trăng","Lực hút của mọi vật tác dụng lên Trái Đất"],correct:1},
+      {question:"Nếu khối lượng một vật tăng gấp đôi thì lực hấp dẫn giữa nó và Trái Đất",answers:["Không đổi","Tăng 2 lần","Giảm 2 lần","Tăng 4 lần"],correct:1},
+      {question:"Nếu khoảng cách giữa hai vật tăng gấp 3, thì lực hấp dẫn:",answers:["Giảm 3 lần","Không giảm","Giảm 6 lần","Giảm 9 lần"],correct:3},
+      {question:"Định luật vạn vật hấp dẫn giúp ta:",answers:["Giải thích quỹ đạo hành tinh","Phóng vệ tinh nhân tạo","Hiểu hiện tượng thủy triều","Tất cả đều đúng"],correct:3},
+      {question:"Đại lượng nào sau đây không ảnh hưởng đến lực hấp dẫn giữa hai vật?",answers:["Khối lượng vật thứ nhất","Khối lượng vật thứ hai","Khoảng cách giữa hai vật","Vận tốc chuyển động của hai vật"],correct:3},
+      {question:"Một vật có khối lượng m đặt trên mặt đất chịu tác dụng lực hút của Trái Đất là F, nếu đưa vật đó lên độ cao bằng đúng bán kính R thì lực hấp dẫn sẽ bằng bao nhiêu?",answers:["F","1/2F","1/3F","1/4F"],correct:3}
+    ];
 
-    let currentQuestion = 0;
-    let score = 0;
-    const answered = new Set();
+    let currentQuestion=0, score=0;
+    const answered=new Set();
 
-    // Tạo card
-    const cardContainer = document.getElementById("cards");
-    questions.forEach((q, i) => {
-      const card = document.createElement("div");
-      card.className = "magic-card";
-      card.textContent = "Câu " + (i+1);
-      card.onclick = () => openQuestion(i, card);
+    const cardContainer=document.getElementById("cards");
+    questions.forEach((q,i)=>{
+      const card=document.createElement("div");
+      card.className="magic-card";
+      card.textContent="Câu "+(i+1);
+      card.onclick=()=>openQuestion(i,card);
       cardContainer.appendChild(card);
     });
 
-    function openQuestion(index, card) {
-      if (answered.has(index)) return;
-      currentQuestion = index;
-      document.getElementById("questionText").textContent = questions[index].question;
-      const ansBox = document.getElementById("answers");
-      ansBox.innerHTML = "";
-      questions[index].answers.forEach((ans, i) => {
-        const btn = document.createElement("button");
-        btn.textContent = ans;
-        btn.onclick = () => selectAnswer(i, card);
+    function openQuestion(index,card){
+      if(answered.has(index)) return;
+      currentQuestion=index;
+      document.getElementById("questionText").textContent=questions[index].question;
+      const ansBox=document.getElementById("answers");
+      ansBox.innerHTML="";
+      questions[index].answers.forEach((ans,i)=>{
+        const btn=document.createElement("button");
+        btn.textContent=ans;
+        btn.onclick=()=>selectAnswer(i,card);
         ansBox.appendChild(btn);
       });
-      document.getElementById("questionModal").style.display = "flex";
+      document.getElementById("questionModal").style.display="flex";
     }
 
-    function closeQuestionModal() {
-      document.getElementById("questionModal").style.display = "none";
-    }
+    function closeQuestionModal(){ document.getElementById("questionModal").style.display="none"; }
 
-    function selectAnswer(choice, card) {
-      const q = questions[currentQuestion];
+    function selectAnswer(choice,card){
+      const q=questions[currentQuestion];
       answered.add(currentQuestion);
       card.classList.add("answered");
-      closeQuestionModal();
 
-      if (choice === q.correct) {
-        score++;
-        showResult(true);
-        createConfetti();
-        // Ẩn card sau khi trả lời đúng
-        card.style.opacity = "0.5";
-      } else {
-        showResult(false);
-        document.body.classList.add("shake");
-        setTimeout(() => document.body.classList.remove("shake"), 500);
-      }
-      updateScore();
-      updateProgress();
-
-      if (answered.size === questions.length) {
-        setTimeout(showFinalResult, 600);
-      }
+      // Giữ câu hỏi 1 giây trước khi hiện kết quả
+      setTimeout(()=>{
+        closeQuestionModal();
+        if(choice===q.correct){
+          score++;
+          showResult(true);
+          createConfetti();
+          card.style.opacity="0.5";
+        }else{
+          showResult(false);
+          document.body.classList.add("shake");
+          setTimeout(()=>document.body.classList.remove("shake"),500);
+        }
+        updateScore();
+        updateProgress();
+        if(answered.size===questions.length){
+          setTimeout(showFinalResult,600);
+        }
+      },1000);
     }
 
-    function showResult(correct) {
-      const modal = document.getElementById("resultModal");
-      const box = document.getElementById("resultContent");
-      let content = correct
-        ? "<h2>🎉 Chính xác!</h2>"
-        : "<h2>❌ Sai mất rồi!</h2>";
-      content += "<button class='btn' onclick='closeResultModal()'>Tiếp tục</button>";
-      box.innerHTML = content;
-      modal.style.display = "flex";
+    function showResult(correct){
+      const modal=document.getElementById("resultModal");
+      const box=document.getElementById("resultContent");
+      let content=correct?"<h2>🎉 Chính xác!</h2>":"<h2>❌ Sai mất rồi!</h2>";
+      content+="<button class='btn' onclick='closeResultModal()'>Tiếp tục</button>";
+      box.innerHTML=content;
+      modal.style.display="flex";
     }
 
-    function closeResultModal() {
-      document.getElementById("resultModal").style.display = "none";
-    }
+    function closeResultModal(){ document.getElementById("resultModal").style.display="none"; }
 
-    function showFinalResult() {
-      const modal = document.getElementById("resultModal");
-      const box = document.getElementById("resultContent");
-      let msg = score===questions.length ? "Xuất sắc! 🌟" :
-                score>=5 ? "Rất tốt! 👍" :
-                "Cố gắng thêm nhé! 💪";
-      box.innerHTML = `<h2>Kết quả: ${score}/${questions.length}</h2><p>${msg}</p>
+    function showFinalResult(){
+      const modal=document.getElementById("resultModal");
+      const box=document.getElementById("resultContent");
+      let msg=score===questions.length?"Xuất sắc! 🌟":score>=5?"Rất tốt! 👍":"Cố gắng thêm nhé! 💪";
+      box.innerHTML=`<h2>Kết quả: ${score}/${questions.length}</h2><p>${msg}</p>
       <button class="btn" onclick="resetGame()">Chơi lại</button>`;
-      modal.style.display = "flex";
+      modal.style.display="flex";
     }
 
-    function updateScore() {
-      document.getElementById("score").textContent = `Điểm: ${score}/${questions.length}`;
-    }
+    function updateScore(){ document.getElementById("score").textContent=`Điểm: ${score}/${questions.length}`; }
+    function updateProgress(){ document.getElementById("progress").style.width=(answered.size/questions.length*100)+"%"; }
 
-    function updateProgress() {
-      document.getElementById("progress").style.width = (answered.size/questions.length*100)+"%";
-    }
-
-    function resetGame() {
-      score = 0;
+    function resetGame(){
+      score=0;
       answered.clear();
       updateScore();
       updateProgress();
-      document.querySelectorAll(".magic-card").forEach(c => {
-        c.classList.remove("answered");
-        c.style.opacity = "1"; // reset opacity
-      });
+      document.querySelectorAll(".magic-card").forEach(c=>{ c.classList.remove("answered"); c.style.opacity="1"; });
       closeQuestionModal();
       closeResultModal();
     }
 
-    function createConfetti() {
-      for (let i=0;i<30;i++) {
-        const c = document.createElement("div");
+    function createConfetti(){
+      for(let i=0;i<30;i++){
+        const c=document.createElement("div");
         c.className="confetti";
         c.style.left=Math.random()*100+"%";
         c.style.background=`hsl(${Math.random()*360},100%,50%)`;
