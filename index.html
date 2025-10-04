@@ -226,7 +226,6 @@
     let currentQuestionIndex = -1;
     let score = 0;
     let answeredCount = 0;
-    let gameEnded = false;
     let confettiAnimationId;
 
     // Tạo cards
@@ -234,85 +233,90 @@
       const card = document.createElement("div");
       card.className = "magic-card";
       card.innerText = "Câu hỏi " + (index + 1);
-      card.onclick = () => { if(!gameEnded) openQuestion(index, card); };
+      card.onclick = () => {
+        if (!card.classList.contains("answered")) openQuestion(index, card);
+      };
       cardsContainer.appendChild(card);
     });
 
-    function openQuestion(index, cardElement){
+    function openQuestion(index, cardElement) {
       currentQuestionIndex = index;
       questionText.innerText = questions[index].question;
       answersContainer.innerHTML = "";
       feedback.innerText = "";
       questionModal.style.display = "flex";
 
-      questions[index].answers.forEach((ans,i)=>{
-        const btn=document.createElement("button");
-        btn.innerText=ans;
-        btn.onclick=()=>handleAnswer(i,index,cardElement);
+      questions[index].answers.forEach((ans, i) => {
+        const btn = document.createElement("button");
+        btn.innerText = ans;
+        btn.onclick = () => handleAnswer(i, index, cardElement);
         answersContainer.appendChild(btn);
       });
     }
 
-    function handleAnswer(selected,qIndex,cardElement){
-      const correct=questions[qIndex].correct;
-      Array.from(answersContainer.children).forEach((b,i)=>{
-        b.disabled=true;
-        if(i===correct)b.style.backgroundColor="green";
-        else if(i===selected)b.style.backgroundColor="red";
-        b.style.color="white";
+    function handleAnswer(selected, qIndex, cardElement) {
+      const correct = questions[qIndex].correct;
+      Array.from(answersContainer.children).forEach((b, i) => {
+        b.disabled = true;
+        if (i === correct) b.style.backgroundColor = "green";
+        else if (i === selected) b.style.backgroundColor = "red";
+        b.style.color = "white";
       });
-      if(selected===correct){ correctSound.play(); launchConfetti(); score++; }
+
+      if (selected === correct) { correctSound.play(); launchConfetti(); score++; }
       else wrongSound.play();
 
       answeredCount++;
       cardElement.classList.add("answered");
 
-      progressBar.style.width=`${(answeredCount/questions.length)*100}%`;
-      progressBar.innerText=`${answeredCount}/${questions.length}`;
+      progressBar.style.width = `${(answeredCount / questions.length) * 100}%`;
+      progressBar.innerText = `${answeredCount}/${questions.length}`;
 
-      setTimeout(()=>{
-        questionModal.style.display="none";
-        if(answeredCount===questions.length) endGame();
-      },1000);
+      setTimeout(() => {
+        questionModal.style.display = "none";
+        if (answeredCount === questions.length) endGame();
+      }, 1000);
     }
 
-    function endGame(){
-      gameEnded=true;
-      finalScore.innerText=`Bạn trả lời đúng ${score}/${questions.length} câu!`;
-      endModal.style.display="flex";
+    function endGame() {
+      finalScore.innerText = `Bạn trả lời đúng ${score}/${questions.length} câu!`;
+      endModal.style.display = "flex";
       cancelAnimationFrame(confettiAnimationId);
     }
 
-    function resetGame(){
-      score=0; answeredCount=0; gameEnded=false; currentQuestionIndex=-1;
-      progressBar.style.width=`0%`; progressBar.innerText=`0/${questions.length}`;
-      document.querySelectorAll(".magic-card").forEach(c=>c.classList.remove("answered"));
-      questionModal.style.display="none";
-      endModal.style.display="none";
+    function resetGame() {
+      score = 0;
+      answeredCount = 0;
+      currentQuestionIndex = -1;
+      progressBar.style.width = `0%`;
+      progressBar.innerText = `0/${questions.length}`;
+      document.querySelectorAll(".magic-card").forEach(c => c.classList.remove("answered"));
+      questionModal.style.display = "none";
+      endModal.style.display = "none";
     }
 
-    closeBtn.onclick=()=>{ if(!gameEnded) questionModal.style.display="none"; };
-    window.onclick=(e)=>{ if(!gameEnded && e.target==questionModal) questionModal.style.display="none"; };
-    resetBtn.onclick=resetGame;
+    closeBtn.onclick = () => { questionModal.style.display = "none"; };
+    window.onclick = (e) => { if (e.target == questionModal) questionModal.style.display = "none"; };
+    resetBtn.onclick = resetGame;
 
-    function launchConfetti(){
-      confettiCanvas.width=window.innerWidth;
-      confettiCanvas.height=window.innerHeight;
-      const confetti=[];
-      for(let i=0;i<100;i++) confetti.push({x:Math.random()*confettiCanvas.width,y:Math.random()*confettiCanvas.height,r:Math.random()*6+4});
-      function draw(){
-        ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
-        confetti.forEach(c=>{
+    function launchConfetti() {
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+      const confetti = [];
+      for (let i = 0; i < 100; i++) confetti.push({ x: Math.random() * confettiCanvas.width, y: Math.random() * confettiCanvas.height, r: Math.random() * 6 + 4 });
+      function draw() {
+        ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+        confetti.forEach(c => {
           ctx.beginPath();
-          ctx.arc(c.x,c.y,c.r,0,2*Math.PI);
-          ctx.fillStyle='hsl('+Math.random()*360+',100%,50%)';
+          ctx.arc(c.x, c.y, c.r, 0, 2 * Math.PI);
+          ctx.fillStyle = 'hsl(' + Math.random() * 360 + ',100%,50%)';
           ctx.fill();
-          c.y+=2; if(c.y>confettiCanvas.height)c.y=-10;
+          c.y += 2; if (c.y > confettiCanvas.height) c.y = -10;
         });
-        confettiAnimationId=requestAnimationFrame(draw);
+        confettiAnimationId = requestAnimationFrame(draw);
       }
       draw();
-      setTimeout(()=>cancelAnimationFrame(confettiAnimationId),2000);
+      setTimeout(() => cancelAnimationFrame(confettiAnimationId), 2000);
     }
   </script>
 </body>
