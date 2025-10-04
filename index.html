@@ -91,14 +91,12 @@
       width: 60%;
     }
 
-    /* Modal chiếm toàn màn hình */
     .modal {
       display: none;
       position: fixed;
       z-index: 10;
       left: 0; top: 0;
       width: 100%; height: 100%;
-      overflow: auto;
       background-color: rgba(0,0,0,0.95);
       display: flex;
       justify-content: center;
@@ -148,34 +146,14 @@
       transform: scale(1.05);
     }
 
-    #confetti-canvas {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 100;
-    }
-
     #endModal .modal-content {
       text-align: center;
       font-size: 24px;
     }
 
-    @-webkit-keyframes rainbow {
-       from { -webkit-filter:hue-rotate(10deg); }
-       to   { -webkit-filter:hue-rotate(360deg); }
-    }
-
     @keyframes rainbow {
-      from {
-        -webkit-filter: hue-rotate(10deg);
-                filter: hue-rotate(10deg);
-      }
-      to {
-        -webkit-filter: hue-rotate(360deg);
-                filter: hue-rotate(360deg);
-      }
+      from { filter: hue-rotate(10deg); }
+      to   { filter: hue-rotate(360deg); }
     }
   </style>
 </head>
@@ -205,7 +183,7 @@
     <div class="modal-content">
       <h2>🎉 Chúc mừng bạn đã hoàn thành trò chơi! 🎉</h2>
       <p id="finalScore"></p>
-      <button onclick="location.reload()">Chơi lại</button>
+      <button onclick="resetGame()">Chơi lại</button>
     </div>
   </div>
 
@@ -245,13 +223,15 @@
     let currentQuestionIndex = -1;
     let score = 0;
     let answeredCount = 0;
+    let gameEnded = false;
     let confettiAnimationId;
 
+    // Tạo cards
     questions.forEach((q, index) => {
       const card = document.createElement("div");
       card.className = "magic-card";
       card.innerText = "Câu hỏi " + (index + 1);
-      card.onclick = () => openQuestion(index, card);
+      card.onclick = () => { if(!gameEnded) openQuestion(index, card); };
       cardsContainer.appendChild(card);
     });
 
@@ -281,11 +261,9 @@
 
       if (selected === correct) {
         correctSound.play();
-        score++;
         launchConfetti();
-      } else {
-        wrongSound.play();
-      }
+        score++;
+      } else wrongSound.play();
 
       answeredCount++;
       cardElement.classList.add("answered");
@@ -294,74 +272,55 @@
 
       setTimeout(() => {
         questionModal.style.display = "none";
-        if (answeredCount === questions.length) showEndModal();
-      }, 1500);
+        if(answeredCount === questions.length) endGame();
+      }, 1000);
     }
 
-    closeBtn.onclick = () => { questionModal.style.display = "none"; };
-    window.onclick = (event) => { if (event.target == questionModal) questionModal.style.display = "none"; };
-
-    function showEndModal() {
+    function endGame() {
+      gameEnded = true;
       finalScore.innerText = `Bạn trả lời đúng ${score}/${questions.length} câu!`;
       endModal.style.display = "flex";
+      cancelAnimationFrame(confettiAnimationId);
     }
 
-    resetBtn.onclick = () => {
+    function resetGame() {
       score = 0;
       answeredCount = 0;
+      gameEnded = false;
       currentQuestionIndex = -1;
-
       progressBar.style.width = `0%`;
       progressBar.innerText = `0/${questions.length}`;
-
       const cards = document.querySelectorAll(".magic-card");
       cards.forEach(card => card.classList.remove("answered"));
-
       questionModal.style.display = "none";
       endModal.style.display = "none";
+    }
 
-      cancelAnimationFrame(confettiAnimationId);
-    };
+    closeBtn.onclick = () => { if(!gameEnded) questionModal.style.display = "none"; };
+    window.onclick = (event) => { if(!gameEnded && event.target == questionModal) questionModal.style.display = "none"; };
 
-    const confettiParticles = [];
+    // Confetti đơn giản
     function launchConfetti() {
       confettiCanvas.width = window.innerWidth;
       confettiCanvas.height = window.innerHeight;
-
-      for (let i = 0; i < 100; i++) {
-        confettiParticles.push({
-          x: Math.random() * confettiCanvas.width,
-          y: Math.random() * confettiCanvas.height - confettiCanvas.height,
-          r: Math.random() * 6 + 4,
-          d: Math.random() * 20 + 10,
-          color: `hsl(${Math.random()*360},100%,50%)`,
-          tilt: Math.random() * 10 - 10,
-          tiltAngleIncrement: Math.random() * 0.07 + 0.05,
-          tiltAngle: 0
+      const confetti = [];
+      for(let i=0;i<100;i++){
+        confetti.push({x: Math.random()*confettiCanvas.width, y: Math.random()*confettiCanvas.height, r: Math.random()*6+4, d: Math.random()*100});
+      }
+      function draw() {
+        ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+        confetti.forEach(c=>{
+          ctx.beginPath();
+          ctx.arc(c.x, c.y, c.r, 0, Math.PI*2);
+          ctx.fillStyle = 'hsl(' + Math.random()*360 + ',100%,50%)';
+          ctx.fill();
+          c.y += 2;
+          if(c.y>confettiCanvas.height)c.y = -10;
         });
+        confettiAnimationId = requestAnimationFrame(draw);
       }
-      animateConfetti();
-      setTimeout(() => confettiParticles.length = 0, 2000);
-    }
-
-    function animateConfetti() {
-      ctx.clearRect(0,0,confettiCanvas.width, confettiCanvas.height);
-      confettiParticles.forEach(p => {
-        p.tiltAngle += p.tiltAngleIncrement;
-        p.y += (Math.cos(p.d) + 3 + p.r/2)/2;
-        p.x += Math.sin(p.d);
-        p.tilt = Math.sin(p.tiltAngle) * 15;
-
-        ctx.beginPath();
-        ctx.lineWidth = p.r/2;
-        ctx.strokeStyle = p.color;
-        ctx.moveTo(p.x + p.tilt + p.r/4, p.y);
-        ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r/4);
-        ctx.stroke();
-      });
-      if(confettiParticles.length > 0) {
-        confettiAnimationId = requestAnimationFrame(animateConfetti);
-      }
+      draw();
+      setTimeout(()=>cancelAnimationFrame(confettiAnimationId),2000);
     }
   </script>
 </body>
