@@ -19,6 +19,39 @@
       text-shadow: 2px 2px 4px #000;
     }
 
+    /* Thanh tiến trình */
+    #progress-container {
+      width: 70%;
+      background-color: #555;
+      border-radius: 10px;
+      margin: 20px auto;
+      height: 25px;
+      overflow: hidden;
+    }
+
+    #progress-bar {
+      height: 100%;
+      width: 0%;
+      background-color: #4caf50;
+      text-align: center;
+      line-height: 25px;
+      color: white;
+      font-weight: bold;
+      transition: width 0.3s;
+    }
+
+    /* Nút reset */
+    #resetBtn {
+      background-color:#f44336;
+      color:white;
+      border:none;
+      border-radius:6px;
+      padding:10px 20px;
+      margin-bottom:20px;
+      cursor:pointer;
+      font-size:16px;
+    }
+
     .cards {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -145,6 +178,12 @@
 <body>
   <h1>Trò chơi trắc nghiệm Vật lý</h1>
 
+  <div id="progress-container">
+    <div id="progress-bar">0/7</div>
+  </div>
+
+  <button id="resetBtn">Reset Trò Chơi</button>
+
   <div class="cards" id="cards"></div>
 
   <div id="questionModal" class="modal">
@@ -166,43 +205,19 @@
 
   <canvas id="confetti-canvas"></canvas>
 
+  <audio id="correctSound" src="assets/sounds/correct.mp3"></audio>
+  <audio id="wrongSound" src="assets/sounds/wrong.mp3"></audio>
+  <audio id="bgMusic" src="assets/sounds/background.mp3" autoplay loop></audio>
+
   <script>
     const questions = [
-      {
-        question: "Lực Hấp dẫn tồn tại giữa:",
-        answers: ["Trái Đất và quả táo", "Mặt Trăng và Trái Đất", "Hai học sinh trong lớp", "Tất cả trường hợp trên"],
-        correct: 3
-      },
-      {
-        question: "Trọng lực là gì?",
-        answers: ["Lực ép của vật lên mặt đất", "Lực hút Trái Đất tác dụng lên vật", "Lực hút giữa Trái Đất và Mặt Trăng", "Lực hút của mọi vật tác dụng lên Trái Đất"],
-        correct: 1
-      },
-      {
-        question: "Nếu khối lượng một vật tăng gấp đôi thì lực hấp dẫn giữa nó và Trái Đất",
-        answers: ["Không đổi", "Tăng 2 lần", "Giảm 2 lần", "Tăng 4 lần"],
-        correct: 1
-      },
-      {
-        question: "Nếu khoảng cách giữa hai vật tăng gấp 3, thì lực hấp dẫn:",
-        answers: ["Giảm 3 lần", "Không giảm", "Giảm 6 lần", "Giảm 9 lần"],
-        correct: 3
-      },
-      {
-        question: "Định luật vạn vật hấp dẫn giúp ta:",
-        answers: ["Giải thích quỹ đạo hành tinh", "Phóng vệ tinh nhân tạo", "Hiểu hiện tượng thủy triều", "Tất cả đều đúng"],
-        correct: 3
-      },
-      {
-        question: "Đại lượng nào sau đây không ảnh hưởng đến lực hấp dẫn giữa hai vật?",
-        answers: ["Khối lượng vật thứ nhất", "Khối lượng vật thứ hai", "Khoảng cách giữa hai vật", "Vận tốc chuyển động của hai vật"],
-        correct: 3
-      },
-      {
-        question: "Một vật có khối lượng m đặt trên mặt đất chịu tác dụng lực hút của Trái Đất là F, nếu đưa vật đó lên độ cao bằng đúng bán kính R thì lực hấp dẫn sẽ bằng bao nhiêu?",
-        answers: ["F", "1/2F", "1/3F", "1/4F"],
-        correct: 3
-      }
+      { question: "Lực Hấp dẫn tồn tại giữa:", answers: ["Trái Đất và quả táo", "Mặt Trăng và Trái Đất", "Hai học sinh trong lớp", "Tất cả trường hợp trên"], correct: 3 },
+      { question: "Trọng lực là gì?", answers: ["Lực ép của vật lên mặt đất", "Lực hút Trái Đất tác dụng lên vật", "Lực hút giữa Trái Đất và Mặt Trăng", "Lực hút của mọi vật tác dụng lên Trái Đất"], correct: 1 },
+      { question: "Nếu khối lượng một vật tăng gấp đôi thì lực hấp dẫn giữa nó và Trái Đất", answers: ["Không đổi", "Tăng 2 lần", "Giảm 2 lần", "Tăng 4 lần"], correct: 1 },
+      { question: "Nếu khoảng cách giữa hai vật tăng gấp 3, thì lực hấp dẫn:", answers: ["Giảm 3 lần", "Không giảm", "Giảm 6 lần", "Giảm 9 lần"], correct: 3 },
+      { question: "Định luật vạn vật hấp dẫn giúp ta:", answers: ["Giải thích quỹ đạo hành tinh", "Phóng vệ tinh nhân tạo", "Hiểu hiện tượng thủy triều", "Tất cả đều đúng"], correct: 3 },
+      { question: "Đại lượng nào sau đây không ảnh hưởng đến lực hấp dẫn giữa hai vật?", answers: ["Khối lượng vật thứ nhất", "Khối lượng vật thứ hai", "Khoảng cách giữa hai vật", "Vận tốc chuyển động của hai vật"], correct: 3 },
+      { question: "Một vật có khối lượng m đặt trên mặt đất chịu tác dụng lực hút của Trái Đất là F, nếu đưa vật đó lên độ cao bằng đúng bán kính R thì lực hấp dẫn sẽ bằng bao nhiêu?", answers: ["F", "1/2F", "1/3F", "1/4F"], correct: 3 }
     ];
 
     const cardsContainer = document.getElementById("cards");
@@ -213,12 +228,19 @@
     const feedback = document.getElementById("feedback");
     const finalScore = document.getElementById("finalScore");
     const closeBtn = document.getElementsByClassName("close")[0];
+    const correctSound = document.getElementById("correctSound");
+    const wrongSound = document.getElementById("wrongSound");
+    const progressBar = document.getElementById("progress-bar");
+    const resetBtn = document.getElementById("resetBtn");
+    const confettiCanvas = document.getElementById("confetti-canvas");
+    const ctx = confettiCanvas.getContext("2d");
 
     let currentQuestionIndex = -1;
     let score = 0;
     let answeredCount = 0;
+    let confettiAnimationId;
 
-    // Tạo card cho mỗi câu hỏi
+    // Tạo card
     questions.forEach((q, index) => {
       const card = document.createElement("div");
       card.className = "magic-card";
@@ -235,17 +257,18 @@
       questionModal.style.display = "block";
 
       questions[index].answers.forEach((ans, i) => {
+        const
         const btn = document.createElement("button");
         btn.innerText = ans;
-        btn.onclick = () => handleAnswer(i, index, cardElement, btn);
+        btn.onclick = () => handleAnswer(i, index, cardElement);
         answersContainer.appendChild(btn);
       });
     }
 
-    function handleAnswer(selected, qIndex, cardElement, btn) {
+    function handleAnswer(selected, qIndex, cardElement) {
       const correct = questions[qIndex].correct;
 
-      // Tô màu ngay khi chọn
+      // Disable tất cả nút và highlight đúng/sai
       Array.from(answersContainer.children).forEach((b, i) => {
         b.disabled = true;
         if (i === correct) b.style.backgroundColor = "green";
@@ -253,32 +276,100 @@
         b.style.color = "white";
       });
 
-      if (selected === correct) score++;
+      // Âm thanh và điểm
+      if (selected === correct) {
+        correctSound.play();
+        score++;
+        launchConfetti();
+      } else {
+        wrongSound.play();
+      }
 
       answeredCount++;
       cardElement.classList.add("answered");
 
+      // Cập nhật thanh tiến trình
+      progressBar.style.width = `${(answeredCount / questions.length) * 100}%`;
+      progressBar.innerText = `${answeredCount}/${questions.length}`;
+
       setTimeout(() => {
         questionModal.style.display = "none";
-        if (answeredCount === questions.length) {
-          showEndModal();
-        }
+        if (answeredCount === questions.length) showEndModal();
       }, 1500);
     }
 
-    closeBtn.onclick = () => {
-      questionModal.style.display = "none";
-    };
-
-    window.onclick = (event) => {
-      if (event.target == questionModal) {
-        questionModal.style.display = "none";
-      }
-    };
+    closeBtn.onclick = () => { questionModal.style.display = "none"; };
+    window.onclick = (event) => { if (event.target == questionModal) questionModal.style.display = "none"; };
 
     function showEndModal() {
       finalScore.innerText = `Bạn trả lời đúng ${score}/${questions.length} câu!`;
       endModal.style.display = "block";
+    }
+
+    // Reset trò chơi
+    resetBtn.onclick = () => {
+      score = 0;
+      answeredCount = 0;
+      currentQuestionIndex = -1;
+
+      progressBar.style.width = `0%`;
+      progressBar.innerText = `0/${questions.length}`;
+
+      const cards = document.querySelectorAll(".magic-card");
+      cards.forEach(card => card.classList.remove("answered"));
+
+      questionModal.style.display = "none";
+      endModal.style.display = "none";
+
+      cancelAnimationFrame(confettiAnimationId);
+
+      Array.from(answersContainer.children).forEach(btn => {
+        btn.disabled = false;
+        btn.style.backgroundColor = "#3949ab";
+        btn.style.color = "white";
+      });
+    };
+
+    // === Confetti ===
+    const confettiParticles = [];
+    function launchConfetti() {
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+
+      for (let i = 0; i < 100; i++) {
+        confettiParticles.push({
+          x: Math.random() * confettiCanvas.width,
+          y: Math.random() * confettiCanvas.height - confettiCanvas.height,
+          r: Math.random() * 6 + 4,
+          d: Math.random() * 20 + 10,
+          color: `hsl(${Math.random()*360},100%,50%)`,
+          tilt: Math.random() * 10 - 10,
+          tiltAngleIncrement: Math.random() * 0.07 + 0.05,
+          tiltAngle: 0
+        });
+      }
+      animateConfetti();
+      setTimeout(() => confettiParticles.length = 0, 2000); // tự dừng sau 2s
+    }
+
+    function animateConfetti() {
+      ctx.clearRect(0,0,confettiCanvas.width, confettiCanvas.height);
+      confettiParticles.forEach(p => {
+        p.tiltAngle += p.tiltAngleIncrement;
+        p.y += (Math.cos(p.d) + 3 + p.r/2)/2;
+        p.x += Math.sin(p.d);
+        p.tilt = Math.sin(p.tiltAngle) * 15;
+
+        ctx.beginPath();
+        ctx.lineWidth = p.r/2;
+        ctx.strokeStyle = p.color;
+        ctx.moveTo(p.x + p.tilt + p.r/4, p.y);
+        ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r/4);
+        ctx.stroke();
+      });
+      if(confettiParticles.length > 0) {
+        confettiAnimationId = requestAnimationFrame(animateConfetti);
+      }
     }
   </script>
 </body>
